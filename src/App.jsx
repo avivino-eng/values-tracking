@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Printer, Calendar } from 'lucide-react';
+import { Printer, Calendar, QrCode } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
+import { QRCodeSVG as QRCode } from 'qrcode.react';
 // Add global styles
 if (typeof document !== 'undefined') {
   const styleEl = document.createElement('style');
@@ -30,6 +30,7 @@ export default function ValuesWorksheet() {
   const [isTracking, setIsTracking] = useState(false);
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('valuesWorksheetData');
@@ -327,45 +328,64 @@ export default function ValuesWorksheet() {
     }
   };
 
-  const parts = [
-    // Introduction
-    <div key="intro" style={{ marginBottom: '1.5rem' }}>
-      <h1 style={styles.h1}>Values Alignment Exercise</h1>
-      <p style={styles.introText}>
-        This exercise helps you see how your daily choices align with your values, and find small ways to move toward what's important to you.
-      </p>
-      {isTracking ? (
-        <div>
-          <button
-            onClick={goToCheckIn}
-            style={{ ...styles.button, ...styles.btnSuccess }}
-          >
-            <Calendar size={20} />
-            <span>Check-In</span>
-          </button>
-          <button
-            onClick={() => setCurrentPart(7)}
-            style={{ ...styles.button, ...styles.btnPrimary }}
-          >
-            View Progress
-          </button>
-          <button
-            onClick={handleStartOver}
-            style={{ ...styles.button, ...styles.btnSecondary }}
-          >
-            Start Over
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => setCurrentPart(1)}
-          style={{ ...styles.button, ...styles.btnPrimary }}
-        >
-          Begin Exercise
-        </button>
-      )}
-    </div>,
-
+   const parts = [
+// Introduction
+<div key="intro" style={{ marginBottom: '1.5rem' }}>
+  <h1 style={styles.h1}>Values-Based Exercise</h1>
+  <p style={styles.introText}>
+    This exercise helps you see how your daily choices align with your values, and find small ways to move toward what's important to you.
+  </p>
+  {isTracking ? (
+    <div>
+      <button
+        onClick={goToCheckIn}
+        style={{ ...styles.button, ...styles.btnSuccess }}
+      >
+        <Calendar size={20} />
+        <span>Check-In</span>
+      </button>
+      <button
+        onClick={() => setCurrentPart(7)}
+        style={{ ...styles.button, ...styles.btnPrimary }}
+      >
+        View Progress
+      </button>
+      <button
+        onClick={() => setShowQRCode(true)}
+        style={{ ...styles.button, ...styles.btnPrimary }}
+      >
+        <>
+          <QrCode size={20} />
+          <span>Share</span>
+        </>
+      </button>
+      <button
+        onClick={handleStartOver}
+        style={{ ...styles.button, ...styles.btnSecondary }}
+      >
+        Start Over
+      </button>
+    </div>
+  ) : (
+    <div>
+      <button
+        onClick={() => setCurrentPart(1)}
+        style={{ ...styles.button, ...styles.btnPrimary }}
+      >
+        Begin Exercise
+      </button>
+      <button
+        onClick={() => setShowQRCode(true)}
+        style={{ ...styles.button, ...styles.btnPrimary }}
+      >
+        <>
+          <QrCode size={20} />
+          <span>Share</span>
+        </>
+      </button>
+    </div>
+  )}
+</div>,    
     // Part 1
     <div key="part1">
       <h2 style={styles.h2}>Part 1: What are things you do regularly to help yourself feel better?</h2>
@@ -630,8 +650,8 @@ export default function ValuesWorksheet() {
           When comfort or coping activities get more check marks than values-based activities, this often tells us something important about what we are managing right now and what we need. This is important information that you can use to make decisions about how to spend your time and effort.
         </p>
         <div style={styles.infoBoxWhite}>
-          <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem' }}>Action Step:</p>
-          <p style={styles.p}>
+          <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem', paddingLeft: '1.5rem' }}>Action Step:</p>
+          <p style={{ ...styles.p, paddingLeft: '1.5rem' }}>
             Look at your Part 3 activities that didn't get a check mark. Pick one. What's one small version of that activity you could do today, even if just for 5 minutes?
           </p>
         </div>
@@ -654,6 +674,16 @@ export default function ValuesWorksheet() {
         <span>Track Your Progress</span>
       </button>
       
+      <button
+        onClick={() => setShowQRCode(true)}
+        style={{ ...styles.button, ...styles.btnPrimary }}
+      >
+        <>
+          <QrCode size={20} />
+          <span>Share</span>
+        </>
+      </button>
+
       <button
         onClick={handlePrint}
         style={{ ...styles.button, ...styles.btnSecondary }}
@@ -777,6 +807,16 @@ export default function ValuesWorksheet() {
       </button>
       
       <button
+        onClick={() => setShowQRCode(true)}
+        style={{ ...styles.button, ...styles.btnPrimary }}
+      >
+        <>
+          <QrCode size={20} />
+          <span>Share</span>
+        </>
+      </button>
+
+      <button
         onClick={() => setCurrentPart(0)}
         style={{ ...styles.button, ...styles.btnSecondary }}
       >
@@ -894,7 +934,32 @@ export default function ValuesWorksheet() {
                 </div>
               </div>
             )}
-            
+            {showQRCode && (
+              <div style={styles.modal}>
+                <div style={styles.modalContent}>
+                  <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Share This Exercise</h3>
+                  <p style={styles.p}>
+                    Scan this QR code or share the link below to access this exercise from any device.
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                    <QRCode 
+                      value="https://avivino-eng.github.io/values-tracking/"
+                      size={200}
+                      level="H"
+                    />
+                  </div>
+                  <p style={{ ...styles.p, fontSize: '0.875rem', textAlign: 'center', wordBreak: 'break-all' }}>
+                    https://avivino-eng.github.io/values-tracking/
+                  </p>
+                  <button
+                    onClick={() => setShowQRCode(false)}
+                    style={{ ...styles.button, ...styles.btnPrimary, marginBottom: 0 }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
             {currentPart > 0 && currentPart < 7 && (
               <div style={styles.progressBar}>
                 <div style={styles.progressLabel}>
