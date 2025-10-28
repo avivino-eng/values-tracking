@@ -331,7 +331,7 @@ export default function ValuesWorksheet() {
    const parts = [
 // Introduction
 <div key="intro" style={{ marginBottom: '1.5rem' }}>
-  <h1 style={styles.h1}>Values-Based Exercise</h1>
+  <h1 style={styles.h1}>Values Alignment Exercise</h1>
   <p style={styles.introText}>
     This exercise helps you see how your daily choices align with your values, and find small ways to move toward what's important to you.
   </p>
