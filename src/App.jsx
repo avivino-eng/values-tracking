@@ -393,7 +393,7 @@ export default function ValuesWorksheet() {
         We all have activities we turn to when life feels overwhelming, when we need immediate relief, or when we're dealing with something difficult. These activities help us deal with stress and bad feelings.
       </p>
       <p style={{ ...styles.p, fontWeight: '500' }}>
-        List 4-5 activities you do regularly for immediate comfort, entertainment, or when dealing with something difficult:
+        List 4-5 activities you do regularly for immediate comfort, energy, entertainment, or to cope with something difficult:
       </p>
       <p style={{ ...styles.p, fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280' }}>
         Examples: Taking a nap, listening to music, scrolling social media, calling a friend to vent, watching TV, playing games, having a drink, sitting outside, comfort eating, browsing online, staying in bed, smoking or vaping, petting your dog or cat.
@@ -428,7 +428,7 @@ export default function ValuesWorksheet() {
         This exercise focuses on values. Values are different from goals. A goal is something you can achieve or complete, like getting a job, losing weight, or making a friend. A value is an ongoing direction, like growing as a person, fostering wellbeing, or contributing to a community. Values cannot be finished or completed. We move toward or away from values through daily choices.
       </p>
       <p style={styles.p}>
-        Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should avoid doing so that we are not bad people. Values tell you what you want and how you want to be because of what is important to you. A value cannot be right or wrong.
+        Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to not be bad. Instead, your values are you want and how you want to be because of what is important to you. A value cannot be right or wrong.
       </p>
       <p style={styles.p}>
         Every day, we make decisions about how to spend our time and energy. Some of these choices move us toward what we care deeply about. Others help us cope with stress, find comfort, or avoid difficult feelings in the moment.
@@ -454,7 +454,7 @@ export default function ValuesWorksheet() {
         Values are the qualities and directions that give your life meaning. They represent who you want to be and how you want to relate to the world. Think about what matters most deeply to you. Below is a list of some common values.
       </p>
       <p style={styles.p}>
-        You might find some, all, or none of these important. You can also add your own. Choose 5 values that are important to you and rank them with the most important at the top.
+        You might find some or all of these important. Think of some others that are unique to you. Choose 5 values that are important to you and rank them with the most important at the top.
       </p>
       <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>
         <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem' }}>Common values:</p>
@@ -537,7 +537,7 @@ export default function ValuesWorksheet() {
     <div key="part4">
       <h2 style={styles.h2}>Part 4: Compare your lists</h2>
       <p style={styles.p}>
-        Now, look at all the activities you listed in Parts 1 and 3. Check any activities you actually did in the past 7 days. If some of your values-based activities happen once a week or less, note that too.
+        Now, look at all the activities you listed in Parts 1 and 3. Check any activities you actually did in the past 7 days. If an activity did not get a check, when was the last time you did that activity?
       </p>
       
       <div style={styles.grid}>
@@ -612,7 +612,7 @@ export default function ValuesWorksheet() {
           {comfortActivities.map((activity, index) => (
             activity && (
               <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0' }}>
-                <span style={{ fontSize: '1.125rem' }}>{comfortChecks[index] ? '✓' : '○'}</span>
+                <span style={{ fontSize: '1.125rem', color: '#1f2937' }}>{comfortChecks[index] ? '✓' : '○'}</span>
                 <span style={{ color: '#1f2937' }}>{activity}</span>
               </div>
             )
@@ -629,7 +629,7 @@ export default function ValuesWorksheet() {
           {valuesActivities.map((activity, index) => (
             activity && (
               <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0' }}>
-                <span style={{ fontSize: '1.125rem' }}>{valuesChecks[index] ? '✓' : '○'}</span>
+                <span style={{ fontSize: '1.125rem', color: '#1f2937' }}>{valuesChecks[index] ? '✓' : '○'}</span>
                 <span style={{ color: '#1f2937' }}>{activity}</span>
               </div>
             )
@@ -659,7 +659,7 @@ export default function ValuesWorksheet() {
 
       <div style={{ ...styles.infoBox, ...styles.infoBoxBlue }}>
         <p style={{ ...styles.p, fontStyle: 'italic' }}>
-          Remember: This exercise isn't about judging yourself, but about understanding yourself with compassion and curiosity.
+          Remember: This exercise is not about judging yourself, it is about understanding yourself with compassion and curiosity.
         </p>
         <p style={styles.p}>
           Understanding your patterns is the first step toward making changes that align with what matters most to you. If you would like support to explore these patterns further and make changes to live more in line with your values, a mental health professional can help.
