@@ -315,7 +315,9 @@ export default function ValuesWorksheet() {
       marginTop: '0.25rem',
       width: '1.25rem',
       height: '1.25rem',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      backgroundColor: 'white',
+      //accentColor: '#059669'
     },
     backButton: {
       marginTop: '1rem',
@@ -428,7 +430,7 @@ export default function ValuesWorksheet() {
         This exercise focuses on values. Values are different from goals. A goal is something you can achieve or complete, like getting a job, losing weight, or making a friend. A value is an ongoing direction, like growing as a person, fostering wellbeing, or contributing to a community. Values cannot be finished or completed. We move toward or away from values through daily choices.
       </p>
       <p style={styles.p}>
-        Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to not be bad. Instead, your values are you want and how you want to be because of what is important to you. A value cannot be right or wrong.
+        Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to not be bad. Instead, your values are what you want and how you want to be because of what is important to you. A value cannot be right or wrong.
       </p>
       <p style={styles.p}>
         Every day, we make decisions about how to spend our time and energy. Some of these choices move us toward what we care deeply about. Others help us cope with stress, find comfort, or avoid difficult feelings in the moment.
@@ -465,21 +467,32 @@ export default function ValuesWorksheet() {
         </div>
       </div>
       <p style={{ ...styles.p, fontWeight: '500' }}>List your 5 most important values in order:</p>
-      {selectedValues.map((value, index) => (
-        <input
-          key={index}
-          type="text"
-          value={value}
-          onChange={(e) => {
-            const newValues = [...selectedValues];
-            newValues[index] = e.target.value;
-            setSelectedValues(newValues);
-            saveData({ selectedValues: newValues });
-          }}
-          placeholder={`Value ${index + 1} (most important ${index === 0 ? 'first' : ''})`}
-          style={styles.input}
-        />
-      ))}
+            
+      {selectedValues.map((value, index) => {
+        const getOrdinal = (n) => {
+          const suffixes = ['th', 'st', 'nd', 'rd'];
+          const v = n % 100;
+          return n + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+        };
+
+        const importance = index === 0 ? 'most important' : `${getOrdinal(index + 1)} most important`;
+
+        return (
+          <input
+            key={index}
+            type="text"
+            value={value}
+            onChange={(e) => {
+              const newValues = [...selectedValues];
+              newValues[index] = e.target.value;
+              setSelectedValues(newValues);
+              saveData({ selectedValues: newValues });
+            }}
+            placeholder={`Value ${index + 1} (${importance})`}
+            style={styles.input}
+          />
+        );
+      })}
       <button
         onClick={() => setCurrentPart(4)}
         style={{ ...styles.button, ...styles.btnPrimary }}
