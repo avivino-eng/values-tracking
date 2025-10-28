@@ -335,7 +335,7 @@ export default function ValuesWorksheet() {
 <div key="intro" style={{ marginBottom: '1.5rem' }}>
   <h1 style={styles.h1}>Values Alignment Exercise</h1>
   <p style={styles.introText}>
-    This exercise helps you see how your daily choices align with your values, and find small ways to move toward what's important to you.
+    This exercise helps you see how your daily choices align with your values, and find small ways to move toward what's important to you. This is for personal use only, and none of your information is shared.
   </p>
   {isTracking ? (
     <div>
@@ -374,11 +374,11 @@ export default function ValuesWorksheet() {
         onClick={() => setCurrentPart(1)}
         style={{ ...styles.button, ...styles.btnPrimary }}
       >
-        Begin Exercise
+        Begin
       </button>
       <button
         onClick={() => setShowQRCode(true)}
-        style={{ ...styles.button, ...styles.btnPrimary }}
+        style={{ ...styles.button, ...styles.btnSecondary }}
       >
         <>
           <QrCode size={20} />
@@ -398,7 +398,7 @@ export default function ValuesWorksheet() {
         List 4-5 activities you do regularly for immediate comfort, energy, entertainment, or to cope with something difficult:
       </p>
       <p style={{ ...styles.p, fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280' }}>
-        Examples: Taking a nap, listening to music, scrolling social media, calling a friend to vent, watching TV, playing games, having a drink, sitting outside, comfort eating, browsing online, staying in bed, smoking or vaping, petting your dog or cat.
+        Examples: Taking a nap, listening to music, scrolling social media, calling a friend to vent, watching TV, playing games, having a drink, sitting outside, comfort eating, browsing online, staying in bed, smoking or vaping, petting your dog or cat, etc...
       </p>
       {comfortActivities.map((activity, index) => (
         <input
@@ -430,7 +430,7 @@ export default function ValuesWorksheet() {
         This exercise focuses on values. Values are different from goals. A goal is something you can achieve or complete, like getting a job, losing weight, or making a friend. A value is an ongoing direction, like growing as a person, fostering wellbeing, or contributing to a community. Values cannot be finished or completed. We move toward or away from values through daily choices.
       </p>
       <p style={styles.p}>
-        Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to not be bad. Instead, your values are what you want and how you want to be because of what is important to you. A value cannot be right or wrong.
+        Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to not be bad. Instead, your values are what you want, and how you want to be, because of what is important to you. A value cannot be right or wrong.
       </p>
       <p style={styles.p}>
         Every day, we make decisions about how to spend our time and energy. Some of these choices move us toward what we care deeply about. Others help us cope with stress, find comfort, or avoid difficult feelings in the moment.
@@ -521,7 +521,7 @@ export default function ValuesWorksheet() {
         List 4-5 specific activities you do that connect to your most important values:
       </p>
       <p style={{ ...styles.p, fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280' }}>
-        Examples: Calling family members, exercising, volunteering, creating art, studying, practicing faith, spending quality time with friends, working on meaningful projects, being in nature, helping colleagues.
+        Examples: Calling family members, exercising, volunteering, creating art, studying, practicing faith, spending quality time with friends, working on meaningful projects, being in nature, helping colleagues, etc...
       </p>
       {valuesActivities.map((activity, index) => (
         <input
