@@ -21,28 +21,88 @@ if (typeof document !== 'undefined') {
 }
 
 export default function ValuesWorksheet() {
+  // Navigation / UI
   const [currentPart, setCurrentPart] = useState(0);
-  const [comfortActivities, setComfortActivities] = useState(['', '', '', '', '']);
-  const [selectedValues, setSelectedValues] = useState(['', '', '', '', '']);
-  const [valuesActivities, setValuesActivities] = useState(['', '', '', '', '']);
-  const [comfortChecks, setComfortChecks] = useState([false, false, false, false, false]);
-  const [valuesChecks, setValuesChecks] = useState([false, false, false, false, false]);
-  const [weeklyData, setWeeklyData] = useState([]);
-  const [currentMood, setCurrentMood] = useState(3);
-  const [isTracking, setIsTracking] = useState(false);
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
-  const [comfortRating, setComfortRating] = useState(null);
-  const [valuesRating, setValuesRating] = useState(null);
+  const [isTracking, setIsTracking] = useState(false);
 
+  // Activities
+  const [comfortActivities, setComfortActivities] = useState(['', '', '', '', '']);
+  const [valuesActivities, setValuesActivities] = useState(['', '', '', '', '']);
+  const [selectedValues, setSelectedValues] = useState(['', '', '', '', '']);
+
+  // Check states
+  const [comfortChecks, setComfortChecks] = useState([false, false, false, false, false]);
+  const [valuesChecks, setValuesChecks] = useState([false, false, false, false, false]);
+
+  // Ratings and mood
+  const [currentMood, setCurrentMood] = useState(3);
+  const [comfortRating, setComfortRating] = useState(3);
+  const [valuesRating, setValuesRating] = useState(3);
+
+  // Progress tracking
+  const [weeklyData, setWeeklyData] = useState([]);
+  const [expandedCheckInIndex, setExpandedCheckInIndex] = useState(null);
+
+  // Save check-in
+  const saveWeeklyCheckIn = () => {
+    // Get checked activities
+    const checkedComfort = comfortActivities.filter((_, i) => comfortChecks[i]);
+    const checkedValues = valuesActivities.filter((_, i) => valuesChecks[i]);
+
+    // Build new entry
+    const newEntry = {
+      date: new Date().toISOString(),
+      comfortCount: checkedComfort.length,
+      valuesCount: checkedValues.length,
+      mood: currentMood,
+      comfortChecked: checkedComfort,
+      valuesChecked: checkedValues,
+      comfortActivities: comfortActivities,
+      valuesActivities: valuesActivities,
+      comfortRating,
+      valuesRating
+    };
+
+    // Update weekly data
+    const newWeeklyData = [...weeklyData, newEntry];
+    setWeeklyData(newWeeklyData);
+
+    // Save to localStorage
+    localStorage.setItem('valuesWorksheetData', JSON.stringify({
+      weeklyData: newWeeklyData,
+      comfortActivities,
+      valuesActivities,
+      selectedValues,
+      isTracking,
+    }));
+
+    // Reset check-in form
+    setComfortChecks([false, false, false, false, false]);
+    setValuesChecks([false, false, false, false, false]);
+    setCurrentMood(3);
+    setComfortRating(3);
+    setValuesRating(3);
+
+    // Close check-in panel
+    setShowCheckIn(false);
+  };
+
+  // Scroll to top on part change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPart]);
+
+  // Load saved data
   useEffect(() => {
     const saved = localStorage.getItem('valuesWorksheetData');
     if (saved) {
       const data = JSON.parse(saved);
       setComfortActivities(data.comfortActivities || ['', '', '', '', '']);
-      setSelectedValues(data.selectedValues || ['', '', '', '', '']);
       setValuesActivities(data.valuesActivities || ['', '', '', '', '']);
+      setSelectedValues(data.selectedValues || ['', '', '', '', '']);
       setWeeklyData(data.weeklyData || []);
       setIsTracking(data.isTracking && data.weeklyData && data.weeklyData.length > 0);
     }
@@ -83,27 +143,12 @@ export default function ValuesWorksheet() {
     setCurrentPart(7);
   };
 
-  const saveWeeklyCheckIn = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const newEntry = {
-      date: today,
-      comfortCount: comfortChecks.filter(c => c).length,
-      valuesCount: valuesChecks.filter(c => c).length,
-      mood: currentMood
-
-    };
-    const newWeeklyData = [...weeklyData, newEntry];
-    setWeeklyData(newWeeklyData);
-    setComfortChecks([false, false, false, false, false]);
-    setValuesChecks([false, false, false, false, false]);
-    saveData({ weeklyData: newWeeklyData });
-    setShowCheckIn(false);
-    setCurrentMood(5);
-  };
-
   const goToCheckIn = () => {
     setComfortChecks([false, false, false, false, false]);
     setValuesChecks([false, false, false, false, false]);
+    setComfortRating(3);
+    setValuesRating(3);
+    setCurrentMood(3);
     setShowCheckIn(true);
   };
 
@@ -124,7 +169,7 @@ export default function ValuesWorksheet() {
   };
 
   const cancelStartOver = () => setShowStartOverConfirm(false);
-
+  
   const styles = {
     container: {
       minHeight: '100vh',
@@ -278,7 +323,6 @@ export default function ValuesWorksheet() {
       border: '1px solid #e5e7eb',
       borderLeft: '4px solid #2563eb'
     },
-
     modal: {
       position: 'fixed',
       inset: 0,
@@ -329,7 +373,6 @@ export default function ValuesWorksheet() {
       height: '1.25rem',
       cursor: 'pointer',
       backgroundColor: 'white',
-      //accentColor: '#059669'
     },
     backButton: {
       marginTop: '1rem',
@@ -342,57 +385,58 @@ export default function ValuesWorksheet() {
     }
   };
 
-   const parts = [
-// Introduction
-<div key="intro" style={{ marginBottom: '1.5rem' }}>
-  <h1 style={styles.h1}>Values Alignment Exercise</h1>
-  <p style={styles.introText}>
-    This exercise helps you see how your daily choices align with your values, and find small ways to move toward what is important to you. This app is for honest personal use only. None of your information is collected or shared. 
-  </p>
-  {isTracking && weeklyData.length > 0 ? (
-    <div>
-      <button
-        onClick={goToCheckIn}
-        style={{ ...styles.button, ...styles.btnSuccess }}
-      >
-        <Calendar size={20} />
-        <span>Check-In</span>
-      </button>
-      <button
-        onClick={() => setCurrentPart(7)}
-        style={{ ...styles.button, ...styles.btnPrimary }}
-      >
-        <TrendingUp size={20} />
-        View Progress
-      </button>
-      <button
-        onClick={() => setShowQRCode(true)}
-        style={{ ...styles.button, ...styles.btnSecondary }}
-      >
-        <>
-          <QrCode size={20} />
-          <span>Link</span>
-        </>
-      </button>
-      <button
-        onClick={handleStartOver}
-        style={{ ...styles.button, ...styles.btnDanger }}
-      >
-        <Ban size={20} />
-        Start Over
-      </button>
-  </div>
-  ) : (
-    <div>
-      <button
-        onClick={() => setCurrentPart(1)}
-        style={{ ...styles.button, ...styles.btnPrimary }}
-      >
-        Begin
-      </button>
-    </div>
-  )}
-</div>,    
+  const parts = [
+    // Introduction
+    <div key="intro" style={{ marginBottom: '1.5rem' }}>
+      <h1 style={styles.h1}>Values Alignment Exercise</h1>
+      <p style={styles.introText}>
+        This exercise helps you see how your daily choices align with your values, and find small ways to move toward what is important to you. This app is for honest personal use only. None of your information is collected or shared. 
+      </p>
+      {isTracking && weeklyData.length > 0 ? (
+        <div>
+          <button
+            onClick={goToCheckIn}
+            style={{ ...styles.button, ...styles.btnSuccess }}
+          >
+            <Calendar size={20} />
+            <span>Check-In</span>
+          </button>
+          <button
+            onClick={() => setCurrentPart(7)}
+            style={{ ...styles.button, ...styles.btnPrimary }}
+          >
+            <TrendingUp size={20} />
+            Progress
+          </button>
+          <button
+            onClick={() => setShowQRCode(true)}
+            style={{ ...styles.button, ...styles.btnSecondary }}
+          >
+            <>
+              <QrCode size={20} />
+              <span>Link</span>
+            </>
+          </button>
+          <button
+            onClick={handleStartOver}
+            style={{ ...styles.button, ...styles.btnDanger }}
+          >
+            <Ban size={20} />
+            Restart
+          </button>
+        </div>
+      ) : (
+        <div>
+          <button
+            onClick={() => setCurrentPart(1)}
+            style={{ ...styles.button, ...styles.btnPrimary }}
+          >
+            Begin
+          </button>
+        </div>
+      )}
+    </div>,    
+    
     // Part 1
     <div key="part1">
       <h2 style={styles.h2}>Part 1: What are things you do regularly to help yourself feel better?</h2>
@@ -434,7 +478,7 @@ export default function ValuesWorksheet() {
       <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>
         <p style={{ ...styles.p, marginTop: '0rem', marginBottom: '0rem' }}>
           This exercise focuses on values. Values are different from goals. A goal is something you can achieve or complete, like getting a job, losing weight, or making a friend. A value is an ongoing direction, like growing as a person, fostering wellbeing, or contributing to a community. Values cannot be finished or completed. We move toward or away from values through daily choices.
-      </p>
+        </p>
       </div>
 
       <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>  
@@ -633,7 +677,7 @@ export default function ValuesWorksheet() {
           {comfortActivities.map((activity, index) => {
             const isChecked = comfortChecks[index];
             const hasContent = activity && activity.trim() !== '';
-            if (!hasContent && !isChecked) return null; // hide unused slots
+            if (!hasContent && !isChecked) return null;
             return (
               <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0' }}>
                 <span style={{ fontSize: '1.125rem', color: '#1f2937' }}>{isChecked ? '✓' : '○'}</span>
@@ -688,471 +732,554 @@ export default function ValuesWorksheet() {
         <div style={styles.infoBoxWhite}>
           <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem', paddingLeft: '1.5rem' }}>Remember:</p>
           <p style={{ ...styles.p, fontStyle: 'italic', paddingLeft: '1.5rem' }}>
-            This exercise is not about judging yourself, it is about understanding yourself with compassion and curiosity.
-          </p>
-        </div>
-        <p style={styles.p}>
-          Understanding your patterns is the first step toward making changes that align with what matters most to you. If you would like support to explore these ideas and make changes to live more in line with your values, a mental health professional can help.
-        </p>  
-      </div>
-      
-      <div style={{ ...styles.infoBox, ...styles.infoBoxGreen }}>
-        <p style={{ ...styles.p, textAlign:'center' }}>
-          You may find it helpful to return to this app to track how often you do certain activities over time.<br />Select <u><b>Track Your Progress</b></u> to get started.<br/>
-        </p>
-      </div>
-
-        <button
-          onClick={startTracking}
-          style={{ ...styles.button, ...styles.btnSuccess }}
-        >
-          <Calendar size={20} />
-          <span>Track Your Progress</span>
-        </button>
-          
-        <button
-          onClick={() => setCurrentPart(0)}
-          style={{ ...styles.button, ...styles.btnPrimary }}
-        >
-          <Home size={20} />
-          Home
-        </button>
-       
-        <button
-          onClick={() => setShowQRCode(true)}
-          style={{ ...styles.button, ...styles.btnSecondary}}
-        >
-          <>
-            <QrCode size={20} />
-            <span>Link</span>
-          </>
-        </button>
-    </div>,
-
-    // Progress Tracking View
-    <div key="progress">
-      <h2 style={styles.h2}>Your Progress Over Time</h2>
-      
-      {weeklyData.length === 1 && (
-        <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess }}>
-          <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}>Tracking Started!</p>
-          <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
-            Your data is saved to this browser. Return to this page anytime to do check-ins and track your progress.
-          </p>
-          <p style={{ ...styles.p, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-            <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and click "Check-In" to record which activities you did. Your progress will be saved automatically.
-          </p>
-          <p style={{ ...styles.p, fontSize: '0.875rem' }}>
-            If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Start Over" from the home screen. Note that this will clear your tracking data.
-          </p>
-        </div>
-      )}
-      
-      {weeklyData.length > 0 && (
-        <>
-          <div style={{ background: 'white', border: '2px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ ...styles.h3, color: '#374151' }}>Activity Trends</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart 
-                data={weeklyData.map(entry => ({
-                  date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                  Comfort: entry.comfortCount,
-                  Values: entry.valuesCount,
-                  Mood: entry.mood ?? null
-                }))}
-                margin={{ top: 5, right: 60, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="#6b7280"
-                  style={{ fontSize: '12px' }}
-                />
-                <YAxis 
-                  stroke="#6b7280"
-                  style={{ fontSize: '12px' }}
-                  domain={[0, 5]}
-                  ticks={[0, 1, 2, 3, 4, 5]}
-                />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="Comfort" 
-                  stroke="#d97706" 
-                  strokeWidth={3}
-                  dot={{ fill: '#d97706', r: 5 }}
-                  activeDot={{ r: 7 }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="Values" 
-                  stroke="#059669" 
-                  strokeWidth={3}
-                  dot={{ fill: '#059669', r: 5 }}
-                  activeDot={{ r: 7 }}
-                />
-              {weeklyData.some(entry => entry.mood !== undefined && entry.mood !== null) && (
-                <Line 
-                  type="monotone" 
-                  dataKey="Mood" 
-                  stroke="#8b5cf6" 
-                  strokeWidth={3}
-                  dot={{ fill: '#8b5cf6', r: 5 }}
-                  activeDot={{ r: 7 }}
-                  connectNulls={false}
-                />
-              )}
-              </LineChart>
-            </ResponsiveContainer>
-            {weeklyData.length === 1 && (
-              <p style={{ fontSize: '0.875rem', color: '#6b7280', textAlign:'center', marginTop: '0.5rem', fontStyle: 'italic' }}>
-                Your trend will develop as you complete more check-ins
-              </p>
-            )}
-          </div>
-
-          <div style={{ background: 'white', border: '2px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ ...styles.h3, color: '#374151' }}>Check-In History</h3>
-            {weeklyData.map((entry, index) => (
-              <div key={index} style={styles.checkInEntry}>
-                <span style={{ color: '#374151', fontWeight: '500' }}>
-                  {new Date(entry.date).toLocaleDateString()}
-                </span>
-                <div style={{ display: 'flex', gap: '1.5rem' }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Comfort</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706' }}>{entry.comfortCount}</div>
+                      This exercise is not about judging yourself, it is about understanding yourself with compassion and curiosity.
+                    </p>
                   </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Values</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#059669' }}>{entry.valuesCount}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ ...styles.infoBox, ...styles.infoBoxBlue }}>
-            <h3 style={{ ...styles.h3, color: '#374151' }}>Summary</h3>
-            <p style={styles.p}>Total check-ins: {weeklyData.length}</p>
-            <p style={styles.p}>Average comfort activities per check-in: {(weeklyData.reduce((sum, e) => sum + e.comfortCount, 0) / weeklyData.length).toFixed(1)}</p>
-            <p style={styles.p}>Average values-based activities per check-in: {(weeklyData.reduce((sum, e) => sum + e.valuesCount, 0) / weeklyData.length).toFixed(1)}</p>
-          </div>
-        </>
-      )}
-        <button
-          onClick={goToCheckIn}
-          style={{ ...styles.button, ...styles.btnSuccess }}
-        >
-          <Calendar size={20} />
-          Check-In
-        </button>
-
-        <button
-          onClick={() => setCurrentPart(0)}
-          style={{ ...styles.button, ...styles.btnPrimary }}
-        >
-          <Home size={20} />
-          Home
-        </button>
-        
-        <button
-          onClick={() => setShowQRCode(true)}
-          style={{ ...styles.button, ...styles.btnSecondary }}
-        >
-          <>
-            <QrCode size={20} />
-            <span>Link</span>
-          </>
-        </button>
-    </div>
-  ];
-
-  return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {showCheckIn ? (
-  <div>
-    <h2 style={{ ...styles.h2, marginBottom: '2rem' }}>Check-In</h2>
-    
-    {/* Mood Section */}
-    <div style={{ marginBottom: '2rem' }}>
-      <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 'bold', fontSize: '1.125rem', color: '#1f2937' }}>
-        How are you feeling?
-      </label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-        <input
-          type="range"
-          min="1"
-          max="5"
-          value={currentMood}
-          onChange={(e) => setCurrentMood(parseInt(e.target.value))}
-          style={{ 
-            flex: 1,
-            accentColor: '#2563eb',
-            height: '8px'
-          }}
-        />
-        <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb', minWidth: '3rem', textAlign: 'center' }}>
-          {currentMood}
-        </span>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
-          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Worst</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
-          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Best</div>
-        </div>
-      </div>
-    </div>
-
-    {/* Activities Section */}
-    <div style={{ marginBottom: '2rem' }}>
-      <p style={{ ...styles.p, fontWeight: 'bold', fontSize: '1.125rem', marginBottom: '1rem' }}>
-        Check any activities you did in the past 7 days
-      </p>
-      <div style={styles.grid}>
-        <div style={{ ...styles.activityBox, ...styles.comfortBox }}>
-          <h3 style={{ ...styles.h3, color: '#78350f' }}>Comfort Activities</h3>
-          {comfortActivities.map((activity, index) => (
-            activity && (
-              <label key={index} style={styles.activityItem}>
-                <input
-                  type="checkbox"
-                  checked={comfortChecks[index]}
-                  onChange={(e) => {
-                    const newChecks = [...comfortChecks];
-                    newChecks[index] = e.target.checked;
-                    setComfortChecks(newChecks);
-                  }}
-                  style={styles.checkbox}
-                />
-                <span style={{ color: '#1f2937' }}>{activity}</span>
-              </label>
-            )
-          ))}
-          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #fcd34d' }}>
-            <p style={{ fontWeight: 'bold', color: '#78350f' }}>
-              Total checked: {comfortChecks.filter(c => c).length}
-            </p>
-          </div>
-        </div>
-
-        <div style={{ ...styles.activityBox, ...styles.valuesBox }}>
-          <h3 style={{ ...styles.h3, color: '#065f46' }}>Values-Based Activities</h3>
-          {valuesActivities.map((activity, index) => (
-            activity && (
-              <label key={index} style={styles.activityItem}>
-                <input
-                  type="checkbox"
-                  checked={valuesChecks[index]}
-                  onChange={(e) => {
-                    const newChecks = [...valuesChecks];
-                    newChecks[index] = e.target.checked;
-                    setValuesChecks(newChecks);
-                  }}
-                  style={styles.checkbox}
-                />
-                <span style={{ color: '#1f2937' }}>{activity}</span>
-              </label>
-            )
-          ))}
-          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #6ee7b7' }}>
-            <p style={{ fontWeight: 'bold', color: '#065f46' }}>
-              Total checked: {valuesChecks.filter(c => c).length}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-{/* Ratings Section */}
-<div style={{ marginBottom: '2rem' }}>
-  <h3 style={{ ...styles.h3, fontSize: '1.125rem', marginBottom: '1.5rem', color: '#374151' }}>Rate Your Activities</h3>
-  
-  <div style={{ marginBottom: '1.5rem' }}>
-    <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: '#374151' }}>
-      Overall, how rewarding were your comfort activities this week?
-    </label>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-      <input
-        type="range"
-        min="1"
-        max="5"
-        value={comfortRating || 3}
-        onChange={(e) => setComfortRating(parseInt(e.target.value))}
-        style={{ 
-          flex: 1,
-          accentColor: '#d97706',
-          height: '8px'
-        }}
-      />
-      <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#d97706', minWidth: '2rem', textAlign: 'center' }}>
-        {comfortRating || '-'}
-      </span>
-    </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
-          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>None</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
-          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Most</div>
-        </div>
-      </div>
-  </div>
-
-  <div>
-    <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: '#374151' }}>
-      Overall, how rewarding were your values-based activities this week?
-    </label>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-      <input
-        type="range"
-        min="1"
-        max="5"
-        value={valuesRating || 3}
-        onChange={(e) => setValuesRating(parseInt(e.target.value))}
-        style={{ 
-          flex: 1,
-          accentColor: '#059669',
-          height: '8px'
-        }}
-      />
-      <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#059669', minWidth: '2rem', textAlign: 'center' }}>
-        {valuesRating || '-'}
-      </span>
-    </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
-          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>None</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
-          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Most</div>
-        </div>
-      </div>
-    </div>
-</div>
-
-    {/* Buttons */}
-    <button
-      onClick={saveWeeklyCheckIn}
-      style={{ ...styles.button, ...styles.btnSuccess }}
-    >
-      <Save size={20} />
-      Save
-    </button>
-    <button
-      onClick={() => {
-        setShowCheckIn(false);
-        setCurrentPart(7);
-      }}
-      style={{ ...styles.button, ...styles.btnPrimary }}
-    >
-      <TrendingUp size={20} />
-      View Progress
-    </button>
-    <button
-      onClick={() => {
-        setShowCheckIn(false);
-        setCurrentPart(0);
-      }}
-      style={{ ...styles.button, ...styles.btnSecondary }}
-    >
-      <Home size={20} />
-      Home
-    </button>
-  </div>
-        ) : (
-          <>
-            {showStartOverConfirm && (
-              <div style={styles.modal}>
-                <div style={styles.modalContent}>
-                  <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Start Over?</h3>
                   <p style={styles.p}>
-                    This will permanently delete all your saved activities and tracking data. Are you sure you want to start over?
-                  </p>
-                  <div style={styles.modalButtons}>
-                    <button
-                      onClick={confirmStartOver}
-                      style={{ ...styles.button, ...styles.btnDanger, flex: 1, marginBottom: 0 }}
-                    >
-                      Yes, Start Over
-                    </button>
-                    <button
-                      onClick={cancelStartOver}
-                      style={{ ...styles.button, ...styles.btnSecondary, flex: 1, marginBottom: 0 }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                    Understanding your patterns is the first step toward making changes that align with what matters most to you. If you would like support to explore these ideas and make changes to live more in line with your values, a mental health professional can help.
+                  </p>  
                 </div>
-              </div>
-            )}
-            {showQRCode && (
-              <div style={styles.modal}>
-                <div style={styles.modalContent}>
-                  <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Link</h3>
-                  <p style={styles.p}>
-                    Use the QR code or the link below to access the values alignment exercise.
+                
+                <div style={{ ...styles.infoBox, ...styles.infoBoxGreen }}>
+                  <p style={{ ...styles.p, textAlign:'center' }}>
+                    You may find it helpful to return to this app to track how often you do certain activities over time.<br />Select <u><b>Track Your Progress</b></u> to get started.<br/>
                   </p>
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                    <QRCode 
-                      value="https://avivino-eng.github.io/values-tracking/"
-                      size={200}
-                      level="H"
-                    />
-                  </div>
-                  <p style={{ ...styles.p, fontSize: '0.875rem', textAlign: 'center', wordBreak: 'break-all' }}>
-                    https://avivino-eng.github.io/values-tracking/
-                  </p>
+                </div>
+
                   <button
-                    onClick={() => setShowQRCode(false)}
-                    style={{ ...styles.button, ...styles.btnPrimary, marginBottom: 0 }}
+                    onClick={startTracking}
+                    style={{ ...styles.button, ...styles.btnSuccess }}
                   >
-                    Close
+                    <Calendar size={20} />
+                    <span>Track Your Progress</span>
                   </button>
-                </div>
+                    
+                  <button
+                    onClick={() => setCurrentPart(0)}
+                    style={{ ...styles.button, ...styles.btnPrimary }}
+                  >
+                    <Home size={20} />
+                    Home
+                  </button>
+                
+                  <button
+                    onClick={() => setShowQRCode(true)}
+                    style={{ ...styles.button, ...styles.btnSecondary}}
+                  >
+                    <>
+                      <QrCode size={20} />
+                      <span>Link</span>
+                    </>
+                  </button>
+              </div>,
+
+              <div key="progress">
+                <h2 style={styles.h2}>Your Progress Over Time</h2>
+                
+                {weeklyData.length === 1 && (
+                  <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess }}>
+                    <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}>Tracking Started!</p>
+                    <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
+                      Your data is saved to this browser. Return to this page anytime to do check-ins and track your progress.
+                    </p>
+                    <p style={{ ...styles.p, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                      <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and click "Check-In" to record which activities you did. Your progress will be saved automatically.
+                    </p>
+                    <p style={{ ...styles.p, fontSize: '0.875rem' }}>
+                      If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Start Over" from the home screen. Note that this will clear your tracking data.
+                    </p>
+                  </div>
+                )}
+                
+                {weeklyData.length > 0 && (
+                  <>
+                    <div style={{ background: 'white', border: '2px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
+                      <h3 style={{ ...styles.h3, color: '#374151' }}>Activity Trends</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart 
+                          data={weeklyData.map(entry => ({
+                            date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                            Comfort: entry.comfortCount,
+                            Values: entry.valuesCount,
+                            Mood: entry.mood ?? null
+                          }))}
+                          margin={{ top: 5, right: 60, left: 0, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis 
+                            dataKey="date" 
+                            stroke="#6b7280"
+                            style={{ fontSize: '12px' }}
+                          />
+                          <YAxis 
+                            stroke="#6b7280"
+                            style={{ fontSize: '12px' }}
+                            domain={[0, 5]}
+                            ticks={[0, 1, 2, 3, 4, 5]}
+                          />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                          />
+                          <Legend 
+                            layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ bottom:0 }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="Comfort"
+                            name="Comfort Activities" 
+                            stroke="#d97706" 
+                            strokeWidth={3}
+                            dot={{ fill: '#d97706', r: 5 }}
+                            activeDot={{ r: 7 }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="Values"
+                            name="Values Activities" 
+                            stroke="#059669" 
+                            strokeWidth={3}
+                            dot={{ fill: '#059669', r: 5 }}
+                            activeDot={{ r: 7 }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="Mood"
+                            name="Mood" 
+                            stroke="#8b5cf6" 
+                            strokeWidth={3}
+                            dot={{ fill: '#8b5cf6', r: 5 }}
+                            activeDot={{ r: 7 }}
+                            connectNulls={true}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                      {weeklyData.length === 1 && (
+                        <p style={{ fontSize: '0.875rem', color: '#6b7280', textAlign:'center', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                          Your trend will develop as you complete more check-ins
+                        </p>
+                      )}
+                    </div>
+
+                    <div style={{ background: 'white', border: '2px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
+                      <h3 style={{ ...styles.h3, color: '#374151' }}>Check-In History</h3>
+                      {weeklyData.map((entry, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            cursor: 'pointer',
+                            marginBottom: '0.5rem',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0.5rem',
+                            padding: '0.5rem',
+                            backgroundColor: '#fff',
+                          }}
+                          onClick={() => setExpandedCheckInIndex(expandedCheckInIndex === index ? null : index)}
+                        >
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            marginBottom: '0.5rem',
+                          }}
+                        >
+                          <span style={{ color: '#374151', fontWeight: '500', marginBottom: '0.25rem' }}>
+                            {new Date(entry.date).toLocaleDateString()}
+                          </span>
+
+                          <div style={{ display: 'flex', flex: 1, gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                            <div
+                              style={{
+                                flex: '1 1 80px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'flex-end',
+                                textAlign: 'center',
+                              }}
+                            >
+                              <div style={{ fontSize: '0.875rem', color: '#6b7280', whiteSpace: 'pre-wrap' }}>Comfort Activities</div>
+                              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706' }}>{entry.comfortCount}</div>
+                            </div>
+
+                            <div
+                              style={{
+                                flex: '1 1 80px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'flex-end',
+                                textAlign: 'center',
+                              }}
+                            >
+                              <div style={{ fontSize: '0.875rem', color: '#6b7280', whiteSpace: 'pre-wrap' }}>Values Activities</div>
+                              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#059669' }}>{entry.valuesCount}</div>
+                            </div>
+
+                            {entry.mood !== undefined && entry.mood !== null && (
+                              <div
+                                style={{
+                                  flex: '1 1 80px',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  justifyContent: 'flex-end',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Mood</div>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#8b5cf6' }}>{entry.mood}</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                          {expandedCheckInIndex === index && (
+                            <div style={{ marginTop: '0.5rem', padding: '0.75rem', backgroundColor: '#f9fafb', borderRadius: '0.5rem', color: '#1f2937' }}>
+                              <p style={{ marginBottom: '0.25rem', fontWeight: 'bold' }}>Comfort Activities Checked:</p>
+                              <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                                {entry.comfortActivities?.filter(act => act).map((act, i) => (
+                                  <li key={i} style={{ wordBreak: 'break-word' }}>{act}</li>
+                                ))}
+                              </ul>
+
+                              <p style={{ margin: '0.5rem 0 0.25rem', fontWeight: 'bold' }}>Values Activities Checked:</p>
+                              <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                                {entry.valuesActivities?.filter(act => act).map((act, i) => (
+                                  <li key={i} style={{ wordBreak: 'break-word' }}>{act}</li>
+                                ))}
+                              </ul>
+
+                              {entry.mood !== undefined && entry.mood !== null && (
+                                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>Mood: {entry.mood}</p>
+                              )}
+
+                              {entry.comfortRating !== undefined && (
+                                <p style={{ marginTop: '0.25rem' }}>Comfort Reward: {entry.comfortRating}</p>
+                              )}
+                              {entry.valuesRating !== undefined && (
+                                <p style={{ marginTop: '0.25rem' }}>Values Reward: {entry.valuesRating}</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div style={{ ...styles.infoBox, ...styles.infoBoxBlue }}>
+                      <h3 style={{ ...styles.h3, color: '#374151' }}>Summary</h3>
+                      <p style={styles.p}>Total check-ins: {weeklyData.length}</p>
+                      <p style={styles.p}>Average comfort activities per check-in: {(weeklyData.reduce((sum, e) => sum + e.comfortCount, 0) / weeklyData.length).toFixed(1)}</p>
+                      <p style={styles.p}>Average values-based activities per check-in: {(weeklyData.reduce((sum, e) => sum + e.valuesCount, 0) / weeklyData.length).toFixed(1)}</p>
+                    </div>
+                  </>
+                )}
+                  <button
+                    onClick={goToCheckIn}
+                    style={{ ...styles.button, ...styles.btnSuccess }}
+                  >
+                    <Calendar size={20} />
+                    Check-In
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentPart(0)}
+                    style={{ ...styles.button, ...styles.btnPrimary }}
+                  >
+                    <Home size={20} />
+                    Home
+                  </button>
+                  
+                  <button
+                    onClick={() => setShowQRCode(true)}
+                    style={{ ...styles.button, ...styles.btnSecondary }}
+                  >
+                    <>
+                      <QrCode size={20} />
+                      <span>Link</span>
+                    </>
+                  </button>
               </div>
-            )}
-            {currentPart > 0 && currentPart < 7 && (
-              <div style={styles.progressBar}>
-                <div style={styles.progressLabel}>
-                  <span>Progress</span>
-                  <span>{currentPart} of 6</span>
-                </div>
-                <div style={styles.progressTrack}>
-                  <div 
-                    style={{ ...styles.progressFill, width: `${(currentPart / 6) * 100}%` }}
+            ];
+
+            return (
+              <div style={styles.container}>
+                <div style={styles.card}>
+                  {showCheckIn ? (
+            <div>
+              <h2 style={{ ...styles.h2, marginBottom: '2rem' }}>Check-In</h2>
+              
+              <div style={{ marginBottom: '2rem' }}>
+                <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 'bold', fontSize: '1.125rem', color: '#1f2937' }}>
+                  How are you feeling?
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={currentMood}
+                    onChange={(e) => setCurrentMood(parseInt(e.target.value))}
+                    style={{ 
+                      flex: 1,
+                      accentColor: '#2563eb',
+                      height: '8px'
+                    }}
                   />
+                  <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb', minWidth: '3rem', textAlign: 'center' }}>
+                    {currentMood}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Worst</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Best</div>
+                  </div>
                 </div>
               </div>
-            )}
 
-            {parts[currentPart]}
+              <div style={{ marginBottom: '2rem' }}>
+                <p style={{ ...styles.p, fontWeight: 'bold', fontSize: '1.125rem', marginBottom: '1rem' }}>
+                  Check any activities you did in the past 7 days
+                </p>
+                <div style={styles.grid}>
+                  <div style={{ ...styles.activityBox, ...styles.comfortBox }}>
+                    <h3 style={{ ...styles.h3, color: '#78350f' }}>Comfort Activities</h3>
+                    {comfortActivities.map((activity, index) => (
+                      activity && (
+                        <label key={index} style={styles.activityItem}>
+                          <input
+                            type="checkbox"
+                            checked={comfortChecks[index]}
+                            onChange={(e) => {
+                              const newChecks = [...comfortChecks];
+                              newChecks[index] = e.target.checked;
+                              setComfortChecks(newChecks);
+                            }}
+                            style={styles.checkbox}
+                          />
+                          <span style={{ color: '#1f2937' }}>{activity}</span>
+                        </label>
+                      )
+                    ))}
+                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #fcd34d' }}>
+                      <p style={{ fontWeight: 'bold', color: '#78350f' }}>
+                        Total checked: {comfortChecks.filter(c => c).length}
+                      </p>
+                    </div>
+                  </div>
 
-            {currentPart > 0 && currentPart < 7 && (
+                  <div style={{ ...styles.activityBox, ...styles.valuesBox }}>
+                    <h3 style={{ ...styles.h3, color: '#065f46' }}>Values-Based Activities</h3>
+                    {valuesActivities.map((activity, index) => (
+                      activity && (
+                        <label key={index} style={styles.activityItem}>
+                          <input
+                            type="checkbox"
+                            checked={valuesChecks[index]}
+                            onChange={(e) => {
+                              const newChecks = [...valuesChecks];
+                              newChecks[index] = e.target.checked;
+                              setValuesChecks(newChecks);
+                            }}
+                            style={styles.checkbox}
+                          />
+                          <span style={{ color: '#1f2937' }}>{activity}</span>
+                        </label>
+                      )
+                    ))}
+                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #6ee7b7' }}>
+                      <p style={{ fontWeight: 'bold', color: '#065f46' }}>
+                        Total checked: {valuesChecks.filter(c => c).length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{ ...styles.h3, fontSize: '1.125rem', marginBottom: '1.5rem', color: '#374151' }}>Rate Your Activities</h3>
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: '#374151' }}>
+                Overall, how rewarding were your comfort activities this week?
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={comfortRating || 3}
+                  onChange={(e) => setComfortRating(parseInt(e.target.value))}
+                  style={{ 
+                    flex: 1,
+                    accentColor: '#d97706',
+                    height: '8px'
+                  }}
+                />
+                <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#d97706', minWidth: '2rem', textAlign: 'center' }}>
+                  {comfortRating || '-'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>None</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Most</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: '#374151' }}>
+                Overall, how rewarding were your values-based activities this week?
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={valuesRating || 3}
+                  onChange={(e) => setValuesRating(parseInt(e.target.value))}
+                  style={{ 
+                    flex: 1,
+                    accentColor: '#059669',
+                    height: '8px'
+                  }}
+                />
+                <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#059669', minWidth: '2rem', textAlign: 'center' }}>
+                  {valuesRating || '-'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>None</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Most</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
               <button
-                onClick={() => setCurrentPart(currentPart - 1)}
-                style={styles.backButton}
+                onClick={() => {
+                  saveWeeklyCheckIn();
+                  setCurrentPart(7);
+                  setShowCheckIn(false);
+                }}      
+                style={{ ...styles.button, ...styles.btnSuccess }}
               >
-                ← Back
+                <Save size={20} />
+                Save
               </button>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
+              <button
+                onClick={() => {
+                  setCurrentPart(7);
+                  setShowCheckIn(false);
+                }}
+                style={{ ...styles.button, ...styles.btnPrimary }}
+              >
+                <TrendingUp size={20} />
+                Progress
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentPart(0);
+                  setShowCheckIn(false);
+                }}
+                style={{ ...styles.button, ...styles.btnSecondary }}
+              >
+                <Home size={20} />
+                Home
+              </button>
+            </div>
+                  ) : (
+                    <>
+                      {showStartOverConfirm && (
+                        <div style={styles.modal}>
+                          <div style={styles.modalContent}>
+                            <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Start Over?</h3>
+                            <p style={styles.p}>
+                              This will allow you to set new activity lists, but will permanently delete all your saved activities and tracking data. Are you sure you want to start over?
+                            </p>
+                            <div style={styles.modalButtons}>
+                              <button
+                                onClick={confirmStartOver}
+                                style={{ ...styles.button, ...styles.btnDanger, flex: 1, marginBottom: 0 }}
+                              >
+                                Yes, Start Over
+                              </button>
+                              <button
+                                onClick={cancelStartOver}
+                                style={{ ...styles.button, ...styles.btnSecondary, flex: 1, marginBottom: 0 }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {showQRCode && (
+                        <div style={styles.modal}>
+                          <div style={styles.modalContent}>
+                            <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Link</h3>
+                            <p style={styles.p}>
+                              Use the QR code or the link below to access the values alignment exercise.
+                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                              <QRCode 
+                                value="https://avivino-eng.github.io/values-tracking/"
+                                size={200}
+                                level="H"
+                              />
+                            </div>
+                            <p style={{ ...styles.p, fontSize: '0.875rem', textAlign: 'center', wordBreak: 'break-all' }}>
+                              https://avivino-eng.github.io/values-tracking/
+                            </p>
+                            <button
+                              onClick={() => setShowQRCode(false)}
+                              style={{ ...styles.button, ...styles.btnPrimary, marginBottom: 0 }}
+                            >
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {currentPart > 0 && currentPart < 7 && (
+                        <div style={styles.progressBar}>
+                          <div style={styles.progressLabel}>
+                            <span>Progress</span>
+                            <span>{currentPart} of 6</span>
+                          </div>
+                          <div style={styles.progressTrack}>
+                            <div 
+                              style={{ ...styles.progressFill, width: `${(currentPart / 6) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {parts[currentPart]}
+
+                      {currentPart > 0 && currentPart < 7 && (
+                        <button
+                          onClick={() => setCurrentPart(currentPart - 1)}
+                          style={styles.backButton}
+                        >
+                          ← Back
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            );
 }
