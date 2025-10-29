@@ -13,6 +13,12 @@ if (typeof document !== 'undefined') {
       width: 100%;
       min-height: 100vh;
     }
+    
+    @media print {
+      .check-in-expanded {
+        display: block !important;
+      }
+    }
   `;
   if (!document.head.querySelector('style[data-app-styles]')) {
     styleEl.setAttribute('data-app-styles', 'true');
@@ -862,6 +868,9 @@ export default function ValuesWorksheet() {
 
                     <div style={{ background: 'white', border: '2px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
                       <h3 style={{ ...styles.h3, color: '#374151' }}>Check-In History</h3>
+                            <p style={{ ...styles.p, fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280' }}>
+                              Tap pannel to expand
+                            </p>
                       {weeklyData.map((entry, index) => (
                         <div
                           key={index}
@@ -932,20 +941,36 @@ export default function ValuesWorksheet() {
                           </div>
                         </div>
 
-                          {expandedCheckInIndex === index && (
-                            <div style={{ marginTop: '0.5rem', padding: '0.75rem', backgroundColor: '#f9fafb', borderRadius: '0.5rem', color: '#1f2937' }}>
-                              <p style={{ marginBottom: '0.25rem', fontWeight: 'bold' }}>Comfort Activities Checked:</p>
+                        <div 
+                          className="check-in-expanded"
+                          style={{ 
+                            marginTop: '0.5rem', 
+                            padding: '0.75rem', 
+                            backgroundColor: '#f9fafb', 
+                            borderRadius: '0.5rem', 
+                            color: '#1f2937',
+                            display: expandedCheckInIndex === index ? 'block' : 'none'
+                          }}
+                        >
+                          <p style={{ marginBottom: '0.25rem', fontWeight: 'bold', color: '#1f2937' }}>Comfort Activities Checked:</p>
+                          <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                            {entry.comfortChecked && entry.comfortChecked.length > 0 ? (
+                              entry.comfortChecked.map((act, i) => (
+                                <li key={i} style={{ wordBreak: 'break-word' }}>{act}</li>
+                              ))
+                            ) : (
+                              <li style={{ wordBreak: 'break-word', color: '#6b7280' }}>None</li>
+                            )}
+                          </ul>
+                              <p style={{ margin: '0.5rem 0 0.25rem', fontWeight: 'bold', color: '#1f2937' }}>Values Activities Checked:</p>
                               <ul style={{ margin: 0, paddingLeft: '1rem' }}>
-                                {entry.comfortActivities?.filter(act => act).map((act, i) => (
-                                  <li key={i} style={{ wordBreak: 'break-word' }}>{act}</li>
-                                ))}
-                              </ul>
-
-                              <p style={{ margin: '0.5rem 0 0.25rem', fontWeight: 'bold' }}>Values Activities Checked:</p>
-                              <ul style={{ margin: 0, paddingLeft: '1rem' }}>
-                                {entry.valuesActivities?.filter(act => act).map((act, i) => (
-                                  <li key={i} style={{ wordBreak: 'break-word' }}>{act}</li>
-                                ))}
+                                {entry.valuesChecked && entry.valuesChecked.length > 0 ? (
+                                  entry.valuesChecked.map((act, i) => (
+                                    <li key={i} style={{ wordBreak: 'break-word' }}>{act}</li>
+                                  ))
+                                ) : (
+                                  <li style={{ wordBreak: 'break-word', color: '#6b7280' }}>None</li>
+                                )}
                               </ul>
 
                               {entry.mood !== undefined && entry.mood !== null && (
@@ -953,13 +978,13 @@ export default function ValuesWorksheet() {
                               )}
 
                               {entry.comfortRating !== undefined && (
-                                <p style={{ marginTop: '0.25rem' }}>Comfort Reward: {entry.comfortRating}</p>
+                                <p style={{ marginTop: '0.5rem', fontWeight: 'bold', color: '#1f2937' }}>Comfort Reward: {entry.comfortRating}</p>
                               )}
                               {entry.valuesRating !== undefined && (
-                                <p style={{ marginTop: '0.25rem' }}>Values Reward: {entry.valuesRating}</p>
+                                <p style={{ marginTop: '0.25rem', fontWeight: 'bold', color: '#1f2937' }}>Values Reward: {entry.valuesRating}</p>
                               )}
                             </div>
-                          )}
+                          )
                         </div>
                       ))}
                     </div>
@@ -996,6 +1021,14 @@ export default function ValuesWorksheet() {
                       <QrCode size={20} />
                       <span>Link</span>
                     </>
+                  </button>
+
+                  <button
+                    onClick={handlePrint}
+                    style={{ ...styles.button, ...styles.btnSecondary }}
+                  >
+                    <Printer size={20} />
+                    PDF
                   </button>
               </div>
             ];
@@ -1130,7 +1163,7 @@ export default function ValuesWorksheet() {
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Most</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Very</div>
                 </div>
               </div>
             </div>
@@ -1163,7 +1196,7 @@ export default function ValuesWorksheet() {
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Most</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Very</div>
                 </div>
               </div>
             </div>
