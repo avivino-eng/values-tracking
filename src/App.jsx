@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Printer, Calendar, QrCode } from 'lucide-react';
+import { Printer, Calendar, QrCode, Home, TrendingUp, Ban, Save } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
+
 // Add global styles
 if (typeof document !== 'undefined') {
   const styleEl = document.createElement('style');
@@ -27,10 +28,13 @@ export default function ValuesWorksheet() {
   const [comfortChecks, setComfortChecks] = useState([false, false, false, false, false]);
   const [valuesChecks, setValuesChecks] = useState([false, false, false, false, false]);
   const [weeklyData, setWeeklyData] = useState([]);
+  const [currentMood, setCurrentMood] = useState(3);
   const [isTracking, setIsTracking] = useState(false);
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [comfortRating, setComfortRating] = useState(null);
+  const [valuesRating, setValuesRating] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('valuesWorksheetData');
@@ -40,7 +44,7 @@ export default function ValuesWorksheet() {
       setSelectedValues(data.selectedValues || ['', '', '', '', '']);
       setValuesActivities(data.valuesActivities || ['', '', '', '', '']);
       setWeeklyData(data.weeklyData || []);
-      setIsTracking(data.isTracking || false);
+      setIsTracking(data.isTracking && data.weeklyData && data.weeklyData.length > 0);
     }
   }, []);
 
@@ -70,7 +74,7 @@ export default function ValuesWorksheet() {
     const newEntry = {
       date: today,
       comfortCount: comfortChecks.filter(c => c).length,
-      valuesCount: valuesChecks.filter(c => c).length
+      valuesCount: valuesChecks.filter(c => c).length,
     };
     const newWeeklyData = [...weeklyData, newEntry];
     setWeeklyData(newWeeklyData);
@@ -84,7 +88,9 @@ export default function ValuesWorksheet() {
     const newEntry = {
       date: today,
       comfortCount: comfortChecks.filter(c => c).length,
-      valuesCount: valuesChecks.filter(c => c).length
+      valuesCount: valuesChecks.filter(c => c).length,
+      mood: currentMood
+
     };
     const newWeeklyData = [...weeklyData, newEntry];
     setWeeklyData(newWeeklyData);
@@ -92,6 +98,7 @@ export default function ValuesWorksheet() {
     setValuesChecks([false, false, false, false, false]);
     saveData({ weeklyData: newWeeklyData });
     setShowCheckIn(false);
+    setCurrentMood(5);
   };
 
   const goToCheckIn = () => {
@@ -262,11 +269,16 @@ export default function ValuesWorksheet() {
       background: '#f9fafb',
       borderLeft: '4px solid #6b7280'
     },
+    infoBoxGreen: {
+      background: '#e6f9ee',
+      borderLeft: '4px solid #34d399'
+    },
     infoBoxWhite: {
       background: 'white',
       border: '1px solid #e5e7eb',
       borderLeft: '4px solid #2563eb'
     },
+
     modal: {
       position: 'fixed',
       inset: 0,
@@ -335,10 +347,11 @@ export default function ValuesWorksheet() {
 <div key="intro" style={{ marginBottom: '1.5rem' }}>
   <h1 style={styles.h1}>Values Alignment Exercise</h1>
   <p style={styles.introText}>
-    This exercise helps you see how your daily choices align with your values, and find small ways to move toward what's important to you. This is for personal use only, and none of your information is shared.
+    This exercise helps you see how your daily choices align with your values, and find small ways to move toward what is important to you. This app is for honest personal use only. None of your information is collected or shared. 
   </p>
-  {isTracking ? (
+  {isTracking && weeklyData.length > 0 ? (
     <div>
+     <div style={{ display: "flex", gap: "1rem" }}> 
       <button
         onClick={goToCheckIn}
         style={{ ...styles.button, ...styles.btnSuccess }}
@@ -350,24 +363,27 @@ export default function ValuesWorksheet() {
         onClick={() => setCurrentPart(7)}
         style={{ ...styles.button, ...styles.btnPrimary }}
       >
+        <TrendingUp size={20} />
         View Progress
       </button>
       <button
         onClick={() => setShowQRCode(true)}
-        style={{ ...styles.button, ...styles.btnPrimary }}
+        style={{ ...styles.button, ...styles.btnSecondary }}
       >
         <>
           <QrCode size={20} />
-          <span>Share</span>
+          <span>Link</span>
         </>
       </button>
       <button
         onClick={handleStartOver}
-        style={{ ...styles.button, ...styles.btnSecondary }}
+        style={{ ...styles.button, ...styles.btnDanger }}
       >
+        <Ban size={20} />
         Start Over
       </button>
-    </div>
+    </div>  
+  </div>
   ) : (
     <div>
       <button
@@ -375,15 +391,6 @@ export default function ValuesWorksheet() {
         style={{ ...styles.button, ...styles.btnPrimary }}
       >
         Begin
-      </button>
-      <button
-        onClick={() => setShowQRCode(true)}
-        style={{ ...styles.button, ...styles.btnSecondary }}
-      >
-        <>
-          <QrCode size={20} />
-          <span>Share</span>
-        </>
       </button>
     </div>
   )}
@@ -395,10 +402,10 @@ export default function ValuesWorksheet() {
         We all have activities we turn to when life feels overwhelming, when we need immediate relief, or when we're dealing with something difficult. These activities help us deal with stress and bad feelings.
       </p>
       <p style={{ ...styles.p, fontWeight: '500' }}>
-        List 4-5 activities you do regularly for immediate comfort, energy, entertainment, or to cope with something difficult:
+        List 5 activities you do regularly for immediate comfort, energy, entertainment, or to cope with something difficult:
       </p>
       <p style={{ ...styles.p, fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280' }}>
-        Examples: Taking a nap, listening to music, scrolling social media, calling a friend to vent, watching TV, playing games, having a drink, sitting outside, comfort eating, browsing online, staying in bed, smoking or vaping, petting your dog or cat, etc...
+        Examples: Taking a nap, listening to music, scrolling social media, venting to a friend, watching TV, playing games, having a drink, sitting outside, comfort eating, browsing online, staying in bed, smoking or vaping, petting your dog or cat...
       </p>
       {comfortActivities.map((activity, index) => (
         <input
@@ -426,21 +433,24 @@ export default function ValuesWorksheet() {
     // Exposition
     <div key="exposition">
       <h2 style={styles.h2}>Use this exercise to help you connect to the things that are most important to you.</h2>
-      <p style={styles.p}>
-        This exercise focuses on values. Values are different from goals. A goal is something you can achieve or complete, like getting a job, losing weight, or making a friend. A value is an ongoing direction, like growing as a person, fostering wellbeing, or contributing to a community. Values cannot be finished or completed. We move toward or away from values through daily choices.
+      <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>
+        <p style={{ ...styles.p, marginTop: '0rem', marginBottom: '0rem' }}>
+          This exercise focuses on values. Values are different from goals. A goal is something you can achieve or complete, like getting a job, losing weight, or making a friend. A value is an ongoing direction, like growing as a person, fostering wellbeing, or contributing to a community. Values cannot be finished or completed. We move toward or away from values through daily choices.
       </p>
-      <p style={styles.p}>
-        Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to not be bad. Instead, your values are what you want, and how you want to be, because of what is important to you. A value cannot be right or wrong.
-      </p>
-      <p style={styles.p}>
-        Every day, we make decisions about how to spend our time and energy. Some of these choices move us toward what we care deeply about. Others help us cope with stress, find comfort, or avoid difficult feelings in the moment.
-      </p>
-      <p style={styles.p}>
-        When we're under stress or facing challenges, we naturally tend to find activities that provide relief or comfort in the moment. Our bodies and minds are designed to seek relief when we're struggling.
-      </p>
-      <p style={styles.p}>
-        This exercise helps you reflect on how your values shape your choices and activities, and what your values might tell you about what you need or how you want to be. As you complete this task, remember to be curious and self-compassionate. There are no right or wrong or good or bad answers, only what is important to you.
-      </p>
+      </div>
+
+      <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>  
+        <p style={{ ...styles.p, marginTop: '0rem', marginBottom: '0rem' }}>
+          Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to be not bad. Instead, your values are what you want, and how you want to be, because of what is important to you. A value cannot be right or wrong.
+        </p>
+      </div>
+
+      <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>  
+        <p style={{ ...styles.p, marginTop: '0rem', marginBottom: '0rem' }}>
+          Next, reflect on how your values shape your choices and activities, and what your values might tell you about what you need or how you want to be. As you complete this task, remember to be curious and self-compassionate. There are no right or wrong or good or bad answers, only what is important to you.
+        </p>
+      </div>
+
       <button
         onClick={() => setCurrentPart(3)}
         style={{ ...styles.button, ...styles.btnPrimary }}
@@ -518,10 +528,10 @@ export default function ValuesWorksheet() {
       )}
       
       <p style={{ ...styles.p, fontWeight: '500' }}>
-        List 4-5 specific activities you do that connect to your most important values:
+        List 5 specific activities you do that connect to your most important values:
       </p>
       <p style={{ ...styles.p, fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280' }}>
-        Examples: Calling family members, exercising, volunteering, creating art, studying, practicing faith, spending quality time with friends, working on meaningful projects, being in nature, helping colleagues, etc...
+        Examples: Calling family members, exercising, volunteering, creating art, studying, practicing faith, spending quality time with friends, working on meaningful projects, being in nature, helping colleagues...
       </p>
       {valuesActivities.map((activity, index) => (
         <input
@@ -622,14 +632,17 @@ export default function ValuesWorksheet() {
       <div style={styles.grid}>
         <div style={{ ...styles.activityBox, ...styles.comfortBox }}>
           <h3 style={{ ...styles.h3, color: '#78350f' }}>Comfort Activities</h3>
-          {comfortActivities.map((activity, index) => (
-            activity && (
+          {comfortActivities.map((activity, index) => {
+            const isChecked = comfortChecks[index];
+            const hasContent = activity && activity.trim() !== '';
+            if (!hasContent && !isChecked) return null; // hide unused slots
+            return (
               <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0' }}>
-                <span style={{ fontSize: '1.125rem', color: '#1f2937' }}>{comfortChecks[index] ? '✓' : '○'}</span>
-                <span style={{ color: '#1f2937' }}>{activity}</span>
+                <span style={{ fontSize: '1.125rem', color: '#1f2937' }}>{isChecked ? '✓' : '○'}</span>
+                <span style={{ color: '#1f2937' }}>{hasContent ? activity : '—'}</span>
               </div>
-            )
-          ))}
+            );
+          })}
           <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #fcd34d' }}>
             <p style={{ fontWeight: 'bold', color: '#78350f' }}>
               Total checked: {comfortChecks.filter(c => c).length}
@@ -660,7 +673,10 @@ export default function ValuesWorksheet() {
         <p style={styles.p}>Which list has more check marks?</p>
         <p style={styles.p}>Is this surprising, or does it make sense given what has been happening in your life lately?</p>
         <p style={styles.p}>
-          When comfort or coping activities get more check marks than values-based activities, this often tells us something important about what we are managing right now and what we need. This is important information that you can use to make decisions about how to spend your time and effort.
+          Every day, we make decisions about how to spend our time and energy. Some choices move us toward what we care deeply about. Others help us cope with stress or avoid difficult feelings. When we're struggling, our bodies and minds naturally seek relief and comfort.
+        </p>
+        <p style={styles.p}>
+          When comfort activities get more check marks than values-based activities, this often tells us something important about what we're managing right now and what we need.
         </p>
         <div style={styles.infoBoxWhite}>
           <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem', paddingLeft: '1.5rem' }}>Action Step:</p>
@@ -675,35 +691,43 @@ export default function ValuesWorksheet() {
           Remember: This exercise is not about judging yourself, it is about understanding yourself with compassion and curiosity.
         </p>
         <p style={styles.p}>
-          Understanding your patterns is the first step toward making changes that align with what matters most to you. If you would like support to explore these patterns further and make changes to live more in line with your values, a mental health professional can help.
+          Understanding your patterns is the first step toward making changes that align with what matters most to you. If you would like support to explore these ideas and make changes to live more in line with your values, a mental health professional can help.
+        </p>
+      </div>
+      
+      <div style={{ ...styles.infoBox, ...styles.infoBoxGreen }}>
+        <p style={{ ...styles.p, textAlign:'center' }}>
+          You may find it helpful to return to this app to track how often you do certain activities over time.<br />Select <u>Track Your Progress</u> to get started.<br/>
         </p>
       </div>
 
-      <button
-        onClick={startTracking}
-        style={{ ...styles.button, ...styles.btnSuccess }}
-      >
-        <Calendar size={20} />
-        <span>Track Your Progress</span>
-      </button>
-      
-      <button
-        onClick={() => setShowQRCode(true)}
-        style={{ ...styles.button, ...styles.btnPrimary }}
-      >
-        <>
-          <QrCode size={20} />
-          <span>Share</span>
-        </>
-      </button>
-
-      <button
-        onClick={handlePrint}
-        style={{ ...styles.button, ...styles.btnSecondary }}
-      >
-        <Printer size={20} />
-        <span>Print or Save as PDF</span>
-      </button>
+      <div style={{ display: "flex", gap: "1rem" }}>
+        <button
+          onClick={startTracking}
+          style={{ ...styles.button, ...styles.btnSuccess }}
+        >
+          <Calendar size={20} />
+          <span>Track Your Progress</span>
+        </button>
+          
+        <button
+          onClick={() => setCurrentPart(0)}
+          style={{ ...styles.button, ...styles.btnPrimary }}
+        >
+          <Home size={20} />
+          Home
+        </button>
+       
+        <button
+          onClick={() => setShowQRCode(true)}
+          style={{ ...styles.button, ...styles.btnSecondary}}
+        >
+          <>
+            <QrCode size={20} />
+            <span>Link</span>
+          </>
+        </button>
+      </div>  
     </div>,
 
     // Progress Tracking View
@@ -720,7 +744,7 @@ export default function ValuesWorksheet() {
             <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and click "Check-In" to record which activities you did. Your progress will be saved automatically.
           </p>
           <p style={{ ...styles.p, fontSize: '0.875rem' }}>
-            If you find it helpful, you can update your activity lists by recompleting the exercise. To do this, select "Start Over" from the home screen. Note that this will clear your tracking data.
+            If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Start Over" from the home screen. Note that this will clear your tracking data.
           </p>
         </div>
       )}
@@ -728,13 +752,14 @@ export default function ValuesWorksheet() {
       {weeklyData.length > 0 && (
         <>
           <div style={{ background: 'white', border: '2px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <h3 style={styles.h3}>Activity Trends</h3>
+            <h3 style={{ ...styles.h3, color: '#374151' }}>Activity Trends</h3>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart 
                 data={weeklyData.map(entry => ({
                   date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                   Comfort: entry.comfortCount,
-                  Values: entry.valuesCount
+                  Values: entry.valuesCount,
+                  Mood: entry.mood ?? null
                 }))}
                 margin={{ top: 5, right: 60, left: 0, bottom: 5 }}
               >
@@ -749,7 +774,6 @@ export default function ValuesWorksheet() {
                   style={{ fontSize: '12px' }}
                   domain={[0, 5]}
                   ticks={[0, 1, 2, 3, 4, 5]}
-                  label={{ value: 'Activities Done', angle: -90, position: 'insideLeft', style: { fontSize: '12px', fill: '#6b7280' } }}
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
@@ -773,6 +797,17 @@ export default function ValuesWorksheet() {
                   dot={{ fill: '#059669', r: 5 }}
                   activeDot={{ r: 7 }}
                 />
+              {weeklyData.some(entry => entry.mood !== undefined && entry.mood !== null) && (
+                <Line 
+                  type="monotone" 
+                  dataKey="Mood" 
+                  stroke="#8b5cf6" 
+                  strokeWidth={3}
+                  dot={{ fill: '#8b5cf6', r: 5 }}
+                  activeDot={{ r: 7 }}
+                  connectNulls={false}
+                />
+              )}
               </LineChart>
             </ResponsiveContainer>
             {weeklyData.length === 1 && (
@@ -783,7 +818,7 @@ export default function ValuesWorksheet() {
           </div>
 
           <div style={{ background: 'white', border: '2px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <h3 style={styles.h3}>Check-In History</h3>
+            <h3 style={{ ...styles.h3, color: '#374151' }}>Check-In History</h3>
             {weeklyData.map((entry, index) => (
               <div key={index} style={styles.checkInEntry}>
                 <span style={{ color: '#374151', fontWeight: '500' }}>
@@ -804,37 +839,40 @@ export default function ValuesWorksheet() {
           </div>
 
           <div style={{ ...styles.infoBox, ...styles.infoBoxBlue }}>
-            <h3 style={{ ...styles.h3, fontSize: '1.125rem' }}>Pattern Summary</h3>
+            <h3 style={{ ...styles.h3, color: '#374151' }}>Summary</h3>
             <p style={styles.p}>Total check-ins: {weeklyData.length}</p>
             <p style={styles.p}>Average comfort activities per check-in: {(weeklyData.reduce((sum, e) => sum + e.comfortCount, 0) / weeklyData.length).toFixed(1)}</p>
             <p style={styles.p}>Average values-based activities per check-in: {(weeklyData.reduce((sum, e) => sum + e.valuesCount, 0) / weeklyData.length).toFixed(1)}</p>
           </div>
         </>
       )}
+      <div style={{ display: "flex", gap: "1rem" }}>
+        <button
+          onClick={goToCheckIn}
+          style={{ ...styles.button, ...styles.btnSuccess }}
+        >
+          <Calendar size={20} />
+          Check-In
+        </button>
 
-      <button
-        onClick={goToCheckIn}
-        style={{ ...styles.button, ...styles.btnSuccess }}
-      >
-        Do Check-In
-      </button>
-      
-      <button
-        onClick={() => setShowQRCode(true)}
-        style={{ ...styles.button, ...styles.btnPrimary }}
-      >
-        <>
-          <QrCode size={20} />
-          <span>Share</span>
-        </>
-      </button>
-
-      <button
-        onClick={() => setCurrentPart(0)}
-        style={{ ...styles.button, ...styles.btnSecondary }}
-      >
-        Back to Home
-      </button>
+        <button
+          onClick={() => setCurrentPart(0)}
+          style={{ ...styles.button, ...styles.btnPrimary }}
+        >
+          <Home size={20} />
+          Home
+        </button>
+        
+        <button
+          onClick={() => setShowQRCode(true)}
+          style={{ ...styles.button, ...styles.btnSecondary }}
+        >
+          <>
+            <QrCode size={20} />
+            <span>Link</span>
+          </>
+        </button>
+      </div>   
     </div>
   ];
 
@@ -842,85 +880,205 @@ export default function ValuesWorksheet() {
     <div style={styles.container}>
       <div style={styles.card}>
         {showCheckIn ? (
-          <div>
-            <h2 style={styles.h2}>Check-In</h2>
-            <p style={styles.p}>
-              Check any activities you did in the past 7 days.
+  <div>
+    <h2 style={{ ...styles.h2, marginBottom: '2rem' }}>Check-In</h2>
+    
+    {/* Mood Section */}
+    <div style={{ marginBottom: '2rem' }}>
+      <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 'bold', fontSize: '1.125rem', color: '#1f2937' }}>
+        How are you feeling?
+      </label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+        <input
+          type="range"
+          min="1"
+          max="5"
+          value={currentMood}
+          onChange={(e) => setCurrentMood(parseInt(e.target.value))}
+          style={{ 
+            flex: 1,
+            accentColor: '#2563eb',
+            height: '8px'
+          }}
+        />
+        <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb', minWidth: '3rem', textAlign: 'center' }}>
+          {currentMood}
+        </span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Worst</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Best</div>
+        </div>
+      </div>
+    </div>
+
+    {/* Activities Section */}
+    <div style={{ marginBottom: '2rem' }}>
+      <p style={{ ...styles.p, fontWeight: 'bold', fontSize: '1.125rem', marginBottom: '1rem' }}>
+        Check any activities you did in the past 7 days
+      </p>
+      <div style={styles.grid}>
+        <div style={{ ...styles.activityBox, ...styles.comfortBox }}>
+          <h3 style={{ ...styles.h3, color: '#78350f' }}>Comfort Activities</h3>
+          {comfortActivities.map((activity, index) => (
+            activity && (
+              <label key={index} style={styles.activityItem}>
+                <input
+                  type="checkbox"
+                  checked={comfortChecks[index]}
+                  onChange={(e) => {
+                    const newChecks = [...comfortChecks];
+                    newChecks[index] = e.target.checked;
+                    setComfortChecks(newChecks);
+                  }}
+                  style={styles.checkbox}
+                />
+                <span style={{ color: '#1f2937' }}>{activity}</span>
+              </label>
+            )
+          ))}
+          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #fcd34d' }}>
+            <p style={{ fontWeight: 'bold', color: '#78350f' }}>
+              Total checked: {comfortChecks.filter(c => c).length}
             </p>
-            
-            <div style={styles.grid}>
-              <div style={{ ...styles.activityBox, ...styles.comfortBox }}>
-                <h3 style={{ ...styles.h3, color: '#78350f' }}>Comfort Activities</h3>
-                {comfortActivities.map((activity, index) => (
-                  activity && (
-                    <label key={index} style={styles.activityItem}>
-                      <input
-                        type="checkbox"
-                        checked={comfortChecks[index]}
-                        onChange={(e) => {
-                          const newChecks = [...comfortChecks];
-                          newChecks[index] = e.target.checked;
-                          setComfortChecks(newChecks);
-                        }}
-                        style={styles.checkbox}
-                      />
-                      <span style={{ color: '#1f2937' }}>{activity}</span>
-                    </label>
-                  )
-                ))}
-                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #fcd34d' }}>
-                  <p style={{ fontWeight: 'bold', color: '#78350f' }}>
-                    Total checked: {comfortChecks.filter(c => c).length}
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ ...styles.activityBox, ...styles.valuesBox }}>
-                <h3 style={{ ...styles.h3, color: '#065f46' }}>Values-Based Activities</h3>
-                {valuesActivities.map((activity, index) => (
-                  activity && (
-                    <label key={index} style={styles.activityItem}>
-                      <input
-                        type="checkbox"
-                        checked={valuesChecks[index]}
-                        onChange={(e) => {
-                          const newChecks = [...valuesChecks];
-                          newChecks[index] = e.target.checked;
-                          setValuesChecks(newChecks);
-                        }}
-                        style={styles.checkbox}
-                      />
-                      <span style={{ color: '#1f2937' }}>{activity}</span>
-                    </label>
-                  )
-                ))}
-                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #6ee7b7' }}>
-                  <p style={{ fontWeight: 'bold', color: '#065f46' }}>
-                    Total checked: {valuesChecks.filter(c => c).length}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={saveWeeklyCheckIn}
-              style={{ ...styles.button, ...styles.btnSuccess }}
-            >
-              Save This Check-In
-            </button>
-            <button
-              onClick={() => setCurrentPart(7)}
-              style={{ ...styles.button, ...styles.btnPrimary }}
-            >
-              View Progress
-            </button>
-            <button
-              onClick={() => setShowCheckIn(false)}
-              style={{ ...styles.button, ...styles.btnSecondary }}
-            >
-              Back to Home
-            </button>
           </div>
+        </div>
+
+        <div style={{ ...styles.activityBox, ...styles.valuesBox }}>
+          <h3 style={{ ...styles.h3, color: '#065f46' }}>Values-Based Activities</h3>
+          {valuesActivities.map((activity, index) => (
+            activity && (
+              <label key={index} style={styles.activityItem}>
+                <input
+                  type="checkbox"
+                  checked={valuesChecks[index]}
+                  onChange={(e) => {
+                    const newChecks = [...valuesChecks];
+                    newChecks[index] = e.target.checked;
+                    setValuesChecks(newChecks);
+                  }}
+                  style={styles.checkbox}
+                />
+                <span style={{ color: '#1f2937' }}>{activity}</span>
+              </label>
+            )
+          ))}
+          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #6ee7b7' }}>
+            <p style={{ fontWeight: 'bold', color: '#065f46' }}>
+              Total checked: {valuesChecks.filter(c => c).length}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{/* Ratings Section */}
+<div style={{ marginBottom: '2rem' }}>
+  <h3 style={{ ...styles.h3, fontSize: '1.125rem', marginBottom: '1.5rem', color: '#374151' }}>Rate Your Activities</h3>
+  
+  <div style={{ marginBottom: '1.5rem' }}>
+    <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: '#374151' }}>
+      Overall, how rewarding were your comfort activities this week?
+    </label>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <input
+        type="range"
+        min="1"
+        max="5"
+        value={comfortRating || 3}
+        onChange={(e) => setComfortRating(parseInt(e.target.value))}
+        style={{ 
+          flex: 1,
+          accentColor: '#d97706',
+          height: '8px'
+        }}
+      />
+      <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#d97706', minWidth: '2rem', textAlign: 'center' }}>
+        {comfortRating || '-'}
+      </span>
+    </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>None</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Most</div>
+        </div>
+      </div>
+  </div>
+
+  <div>
+    <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: '#374151' }}>
+      Overall, how rewarding were your values-based activities this week?
+    </label>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <input
+        type="range"
+        min="1"
+        max="5"
+        value={valuesRating || 3}
+        onChange={(e) => setValuesRating(parseInt(e.target.value))}
+        style={{ 
+          flex: 1,
+          accentColor: '#059669',
+          height: '8px'
+        }}
+      />
+      <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#059669', minWidth: '2rem', textAlign: 'center' }}>
+        {valuesRating || '-'}
+      </span>
+    </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>None</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Most</div>
+        </div>
+      </div>
+    </div>
+</div>
+
+    {/* Buttons */}
+    <div style={{ display: "flex", gap: "1rem" }}>
+    <button
+      onClick={saveWeeklyCheckIn}
+      style={{ ...styles.button, ...styles.btnSuccess }}
+    >
+      <Save size={20} />
+      Save
+    </button>
+    <button
+      onClick={() => {
+        setShowCheckIn(false);
+        setCurrentPart(7);
+      }}
+      style={{ ...styles.button, ...styles.btnPrimary }}
+    >
+      <TrendingUp size={20} />
+      View Progress
+    </button>
+    <button
+      onClick={() => {
+        setShowCheckIn(false);
+        setCurrentPart(0);
+      }}
+      style={{ ...styles.button, ...styles.btnSecondary }}
+    >
+      <Home size={20} />
+      Home
+    </button>
+    </div>
+  </div>
         ) : (
           <>
             {showStartOverConfirm && (
@@ -950,9 +1108,9 @@ export default function ValuesWorksheet() {
             {showQRCode && (
               <div style={styles.modal}>
                 <div style={styles.modalContent}>
-                  <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Share This Exercise</h3>
+                  <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Link</h3>
                   <p style={styles.p}>
-                    Scan this QR code or share the link below to access this exercise from any device.
+                    Use the QR code or the link below to access the values alignment exercise.
                   </p>
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
                     <QRCode 
