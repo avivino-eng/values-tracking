@@ -351,7 +351,6 @@ export default function ValuesWorksheet() {
   </p>
   {isTracking && weeklyData.length > 0 ? (
     <div>
-     <div style={{ display: "flex", gap: "1rem" }}> 
       <button
         onClick={goToCheckIn}
         style={{ ...styles.button, ...styles.btnSuccess }}
@@ -382,7 +381,6 @@ export default function ValuesWorksheet() {
         <Ban size={20} />
         Start Over
       </button>
-    </div>  
   </div>
   ) : (
     <div>
@@ -669,7 +667,7 @@ export default function ValuesWorksheet() {
       </div>
       
       <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>
-        <p style={{ ...styles.p, fontWeight: '500' }}>Look at your lists and check marks.</p>
+        <p style={{ ...styles.p, fontWeight: 'bold', textDecoration: 'underline' }}>Look at your lists and check marks.</p>
         <p style={styles.p}>Which list has more check marks?</p>
         <p style={styles.p}>Is this surprising, or does it make sense given what has been happening in your life lately?</p>
         <p style={styles.p}>
@@ -687,21 +685,23 @@ export default function ValuesWorksheet() {
       </div>
 
       <div style={{ ...styles.infoBox, ...styles.infoBoxBlue }}>
-        <p style={{ ...styles.p, fontStyle: 'italic' }}>
-          Remember: This exercise is not about judging yourself, it is about understanding yourself with compassion and curiosity.
-        </p>
+        <div style={styles.infoBoxWhite}>
+          <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem', paddingLeft: '1.5rem' }}>Remember:</p>
+          <p style={{ ...styles.p, fontStyle: 'italic', paddingLeft: '1.5rem' }}>
+            This exercise is not about judging yourself, it is about understanding yourself with compassion and curiosity.
+          </p>
+        </div>
         <p style={styles.p}>
           Understanding your patterns is the first step toward making changes that align with what matters most to you. If you would like support to explore these ideas and make changes to live more in line with your values, a mental health professional can help.
-        </p>
+        </p>  
       </div>
       
       <div style={{ ...styles.infoBox, ...styles.infoBoxGreen }}>
         <p style={{ ...styles.p, textAlign:'center' }}>
-          You may find it helpful to return to this app to track how often you do certain activities over time.<br />Select <u>Track Your Progress</u> to get started.<br/>
+          You may find it helpful to return to this app to track how often you do certain activities over time.<br />Select <u><b>Track Your Progress</b></u> to get started.<br/>
         </p>
       </div>
 
-      <div style={{ display: "flex", gap: "1rem" }}>
         <button
           onClick={startTracking}
           style={{ ...styles.button, ...styles.btnSuccess }}
@@ -727,7 +727,6 @@ export default function ValuesWorksheet() {
             <span>Link</span>
           </>
         </button>
-      </div>  
     </div>,
 
     // Progress Tracking View
@@ -846,7 +845,6 @@ export default function ValuesWorksheet() {
           </div>
         </>
       )}
-      <div style={{ display: "flex", gap: "1rem" }}>
         <button
           onClick={goToCheckIn}
           style={{ ...styles.button, ...styles.btnSuccess }}
@@ -872,7 +870,6 @@ export default function ValuesWorksheet() {
             <span>Link</span>
           </>
         </button>
-      </div>   
     </div>
   ];
 
@@ -1049,7 +1046,6 @@ export default function ValuesWorksheet() {
 </div>
 
     {/* Buttons */}
-    <div style={{ display: "flex", gap: "1rem" }}>
     <button
       onClick={saveWeeklyCheckIn}
       style={{ ...styles.button, ...styles.btnSuccess }}
@@ -1077,7 +1073,6 @@ export default function ValuesWorksheet() {
       <Home size={20} />
       Home
     </button>
-    </div>
   </div>
         ) : (
           <>
