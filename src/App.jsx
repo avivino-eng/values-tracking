@@ -728,15 +728,15 @@ export default function ValuesWorksheet() {
         <p style={styles.p}>If an activity did not get a check, when was the last time you did that activity?</p>
         <p style={styles.p}>Is this surprising, or does it make sense given what has been happening in your life lately?</p>
         <p style={styles.p}>
-          Every day, we make decisions about how to spend our time and energy. Some choices move us toward what we care deeply about. Others help us cope with stress or avoid difficult feelings. When we're struggling, our bodies and minds naturally seek relief and comfort.
+          Every day, we make decisions about how to spend our time and energy. Some choices move us toward what we care deeply about. Others help us cope with stress or avoid difficult feelings. When we are struggling, our bodies and minds naturally seek relief and comfort.
         </p>
         <p style={styles.p}>
-          When comfort activities get more check marks than values-based activities, this often tells us something important about what we're managing in the moment and what we need.
+          If comfort activities get more check marks than values-based activities, it may say something important about what we are managing in the moment and what we need.
         </p>
         <div style={styles.infoBoxWhite}>
           <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem', paddingLeft: '1.5rem' }}>Action Step:</p>
           <p style={{ ...styles.p, paddingLeft: '1.5rem' }}>
-            Look at your Part 3 activities that didn't get a check mark. Pick one. What's one small version of that activity you could do today, even if just for 5 minutes?
+            Look at your Part 3 activities that did not get a check mark. Pick one. What is one small version of that activity you could do today, even if just for 5 minutes?
           </p>
         </div>
       </div>
@@ -791,7 +791,7 @@ export default function ValuesWorksheet() {
                 
                 {weeklyData.length === 1 && (
                   <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess }}>
-                    <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}>Great work!</p>
+                    <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}><u>Great work</u> making it this far! Keep it up!</p>
                     <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
                       Your data is saved to this browser. Return to this page anytime to do check-ins and track your progress.
                     </p>
@@ -1044,7 +1044,7 @@ export default function ValuesWorksheet() {
 
                   {weeklyData.length === 2 && (
                     <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess, marginTop: '1.5rem' }}>
-                      <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}>Great work!</p>
+                      <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}><u>Great work</u> making it this far! Keep it up!</p>
                       <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
                         Your data is saved to this browser. Return to this page anytime to do check-ins and track your progress.
                       </p>
