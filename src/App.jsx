@@ -44,9 +44,9 @@ export default function ValuesWorksheet() {
   const [valuesChecks, setValuesChecks] = useState([false, false, false, false, false]);
 
   // Ratings and mood
-  const [currentMood, setCurrentMood] = useState(3);
-  const [comfortRating, setComfortRating] = useState(3);
-  const [valuesRating, setValuesRating] = useState(3);
+  const [currentMood, setCurrentMood] = useState(null);
+  const [comfortRating, setComfortRating] = useState(null);
+  const [valuesRating, setValuesRating] = useState(null);
 
   // Progress tracking
   const [weeklyData, setWeeklyData] = useState([]);
@@ -136,11 +136,17 @@ export default function ValuesWorksheet() {
   const handlePrint = () => window.print();
 
   const startTracking = () => {
-    const today = new Date().toISOString().split('T')[0];
+    const checkedComfort = comfortActivities.filter((_, i) => comfortChecks[i]);
+    const checkedValues = valuesActivities.filter((_, i) => valuesChecks[i]);
+    
     const newEntry = {
-      date: today,
-      comfortCount: comfortChecks.filter(c => c).length,
-      valuesCount: valuesChecks.filter(c => c).length,
+      date: new Date().toISOString(),
+      comfortCount: checkedComfort.length,
+      valuesCount: checkedValues.length,
+      comfortChecked: checkedComfort,
+      valuesChecked: checkedValues,
+      comfortActivities: comfortActivities,
+      valuesActivities: valuesActivities
     };
     const newWeeklyData = [...weeklyData, newEntry];
     setWeeklyData(newWeeklyData);
@@ -152,9 +158,9 @@ export default function ValuesWorksheet() {
   const goToCheckIn = () => {
     setComfortChecks([false, false, false, false, false]);
     setValuesChecks([false, false, false, false, false]);
-    setComfortRating(3);
-    setValuesRating(3);
-    setCurrentMood(3);
+    setComfortRating(weeklyData.length >= 1 ? 3 : null);
+    setValuesRating(weeklyData.length >= 1 ? 3 : null);
+    setCurrentMood(weeklyData.length >= 1 ? 3 : null);
     setShowCheckIn(true);
   };
 
@@ -608,7 +614,7 @@ export default function ValuesWorksheet() {
     <div key="part4">
       <h2 style={styles.h2}>Part 4: Compare your lists</h2>
       <p style={styles.p}>
-        Now, look at all the activities you listed in Parts 1 and 3. Check any activities you actually did in the past 7 days. If an activity did not get a check, when was the last time you did that activity?
+        Now, look at all the activities you listed in Parts 1 and 3. Check any activities you did in the past 7 days.
       </p>
       
       <div style={styles.grid}>
@@ -718,13 +724,14 @@ export default function ValuesWorksheet() {
       
       <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>
         <p style={{ ...styles.p, fontWeight: 'bold', textDecoration: 'underline' }}>Look at your lists and check marks.</p>
-        <p style={styles.p}>Which list has more check marks?</p>
+        <p style={styles.p}>Which list has more check marks?</p> 
+        <p style={styles.p}>If an activity did not get a check, when was the last time you did that activity?</p>
         <p style={styles.p}>Is this surprising, or does it make sense given what has been happening in your life lately?</p>
         <p style={styles.p}>
           Every day, we make decisions about how to spend our time and energy. Some choices move us toward what we care deeply about. Others help us cope with stress or avoid difficult feelings. When we're struggling, our bodies and minds naturally seek relief and comfort.
         </p>
         <p style={styles.p}>
-          When comfort activities get more check marks than values-based activities, this often tells us something important about what we're managing right now and what we need.
+          When comfort activities get more check marks than values-based activities, this often tells us something important about what we're managing in the moment and what we need.
         </p>
         <div style={styles.infoBoxWhite}>
           <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem', paddingLeft: '1.5rem' }}>Action Step:</p>
@@ -748,7 +755,7 @@ export default function ValuesWorksheet() {
                 
                 <div style={{ ...styles.infoBox, ...styles.infoBoxGreen }}>
                   <p style={{ ...styles.p, textAlign:'center' }}>
-                    You may find it helpful to return to this app to track how often you do certain activities over time.<br />Select <u><b>Track Your Progress</b></u> to get started.<br/>
+                    You may find it helpful to return to this app to track how often you do certain activities over time.<br />Give it a try!<br />Select <u><b>Track Your Progress</b></u> to get started.
                   </p>
                 </div>
 
@@ -784,15 +791,15 @@ export default function ValuesWorksheet() {
                 
                 {weeklyData.length === 1 && (
                   <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess }}>
-                    <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}>Tracking Started!</p>
+                    <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}>Great work!</p>
                     <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
                       Your data is saved to this browser. Return to this page anytime to do check-ins and track your progress.
                     </p>
                     <p style={{ ...styles.p, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                      <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and click "Check-In" to record which activities you did. Your progress will be saved automatically.
+                      <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and click "Check-In" to record which activities you did. Checking in once a week is a great way to start.
                     </p>
                     <p style={{ ...styles.p, fontSize: '0.875rem' }}>
-                      If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Start Over" from the home screen. Note that this will clear your tracking data.
+                      If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Start Over" from the home screen. Note that this will clear your data.
                     </p>
                   </div>
                 )}
@@ -827,7 +834,10 @@ export default function ValuesWorksheet() {
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
                           />
                           <Legend 
-                            layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ bottom:0 }}
+                            layout="horizontal" 
+                            align="center" 
+                            verticalAlign="bottom" 
+                            wrapperStyle={{ bottom: 0 }}
                           />
                           <Line 
                             type="monotone" 
@@ -847,16 +857,17 @@ export default function ValuesWorksheet() {
                             dot={{ fill: '#059669', r: 5 }}
                             activeDot={{ r: 7 }}
                           />
+                          {weeklyData.some(entry => entry.mood !== undefined && entry.mood !== null) && (
                           <Line 
                             type="monotone" 
                             dataKey="Mood"
-                            name="Mood" 
                             stroke="#8b5cf6" 
                             strokeWidth={3}
                             dot={{ fill: '#8b5cf6', r: 5 }}
                             activeDot={{ r: 7 }}
                             connectNulls={true}
                           />
+                          )}
                         </LineChart>
                       </ResponsiveContainer>
                       {weeklyData.length === 1 && (
@@ -977,10 +988,10 @@ export default function ValuesWorksheet() {
                                 <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>Mood: {entry.mood}</p>
                               )}
 
-                              {entry.comfortRating !== undefined && (
+                              {entry.comfortRating !== undefined && entry.comfortRating !== null && (
                                 <p style={{ marginTop: '0.5rem', fontWeight: 'bold', color: '#1f2937' }}>Comfort Reward: {entry.comfortRating}</p>
                               )}
-                              {entry.valuesRating !== undefined && (
+                              {entry.valuesRating !== undefined && entry.valuesRating !== null && (
                                 <p style={{ marginTop: '0.25rem', fontWeight: 'bold', color: '#1f2937' }}>Values Reward: {entry.valuesRating}</p>
                               )}
                             </div>
@@ -1030,6 +1041,21 @@ export default function ValuesWorksheet() {
                     <Printer size={20} />
                     PDF
                   </button>
+
+                  {weeklyData.length === 2 && (
+                    <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess, marginTop: '1.5rem' }}>
+                      <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}>Great work!</p>
+                      <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
+                        Your data is saved to this browser. Return to this page anytime to do check-ins and track your progress.
+                      </p>
+                      <p style={{ ...styles.p, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                        <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and click "Check-In" to record which activities you did. Checking in once a week is a great way to start.
+                      </p>
+                      <p style={{ ...styles.p, fontSize: '0.875rem' }}>
+                        If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Start Over" from the home screen. Note that this will clear your data.
+                      </p>
+                    </div>
+                  )}
               </div>
             ];
 
