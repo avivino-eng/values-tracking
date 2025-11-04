@@ -499,7 +499,7 @@ export default function ValuesWorksheet() {
 
       <div style={{ ...styles.infoBox, ...styles.infoBoxGray }}>  
         <p style={{ ...styles.p, marginTop: '0rem', marginBottom: '0rem' }}>
-          Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether something is good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to be not bad. Instead, your values are what you want, and how you want to be, because of what is important to you. A value cannot be right or wrong.
+          Values are also different from morals or judgements. Morals say whether things are right or wrong, and judgements say whether things are good or bad. Morals and judgements often tell us about things we should do to be good, or should not do to be not bad. Instead, your values are what you want, and how you want to be, because of what is important to you. A value cannot be right or wrong.
         </p>
       </div>
 
@@ -534,7 +534,7 @@ export default function ValuesWorksheet() {
           ))}
         </div>
       </div>
-      <p style={{ ...styles.p, fontWeight: '500' }}>List your 5 most important values in order:</p>
+      <p style={{ ...styles.p, fontWeight: '500' }}>List 5 important values in order:</p>
             
       {selectedValues.map((value, index) => {
         const getOrdinal = (n) => {
@@ -571,7 +571,7 @@ export default function ValuesWorksheet() {
 
     // Part 3
     <div key="part3">
-      <h2 style={styles.h2}>Part 3: What activities connect you to your values?</h2>
+      <h2 style={styles.h2}>Part 3: What activities connect you to these values?</h2>
       <p style={styles.p}>
         Think about the specific things you can do that connect to these values. These are activities that, when you do them, make you feel like you're living according to what matters most to you. They might require effort or be challenging, but they align with who you want to be.
       </p>
@@ -586,7 +586,7 @@ export default function ValuesWorksheet() {
       )}
       
       <p style={{ ...styles.p, fontWeight: '500' }}>
-        List 5 specific activities you do that connect to your most important values:
+        List 5 specific activities you do (or want to do) that connect to your values:
       </p>
       <p style={{ ...styles.p, fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280' }}>
         Examples: Calling family members, exercising, volunteering, creating art, studying, practicing faith, spending quality time with friends, working on meaningful projects, being in nature, helping colleagues...
