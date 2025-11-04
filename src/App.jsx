@@ -98,8 +98,12 @@ export default function ValuesWorksheet() {
 
   // Scroll to top on part change
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   }, [currentPart]);
+
+  useEffect(() => {
+  window.scrollTo(0, 0);
+  }, [showCheckIn]);
 
   // Load saved data
   useEffect(() => {
@@ -402,7 +406,7 @@ export default function ValuesWorksheet() {
     <div key="intro" style={{ marginBottom: '1.5rem' }}>
       <h1 style={styles.h1}>Values Alignment Exercise</h1>
       <p style={styles.introText}>
-        This exercise helps you see how your daily choices align with your values, and find small ways to move toward what is important to you. This app is for honest personal use only. None of your information is collected or shared. 
+        This exercise helps you see how your daily choices align with your values, and find small ways to move toward what is important to you. Use this exercise if you are struggling with low mood or feeling stuck.<br />It takes about 5 minutes.<br /><br />This app is only for honest personal use. None of your information is collected or shared. 
       </p>
       {isTracking && weeklyData.length > 0 ? (
         <div>
@@ -453,7 +457,7 @@ export default function ValuesWorksheet() {
     <div key="part1">
       <h2 style={styles.h2}>Part 1: What are things you do regularly to help yourself feel better?</h2>
       <p style={styles.p}>
-        We all have activities we turn to when life feels overwhelming, when we need immediate relief, or when we're dealing with something difficult. These activities help us deal with stress and bad feelings.
+        We all have activities we use to help deal with stress and bad feelings. When life feels overwhelming, when we need immediate relief, or when we're dealing with something difficult, we turn to familiar comforts.
       </p>
       <p style={{ ...styles.p, fontWeight: '500' }}>
         List 5 activities you do regularly for immediate comfort, energy, entertainment, or to cope with something difficult:
@@ -612,7 +616,7 @@ export default function ValuesWorksheet() {
 
     // Part 4 - Comparison
     <div key="part4">
-      <h2 style={styles.h2}>Part 4: Compare your lists</h2>
+      <h2 style={styles.h2}>Part 4: Which activities have you done recently?</h2>
       <p style={styles.p}>
         Now, look at all the activities you listed in Parts 1 and 3. Check any activities you did in the past 7 days.
       </p>
@@ -736,7 +740,7 @@ export default function ValuesWorksheet() {
         <div style={styles.infoBoxWhite}>
           <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem', paddingLeft: '1.5rem' }}>Action Step:</p>
           <p style={{ ...styles.p, paddingLeft: '1.5rem' }}>
-            Look at your Part 3 activities that did not get a check mark. Pick one. What is one small version of that activity you could do today, even if just for 5 minutes?
+            Look at your values-based activities that did not get a check mark. Pick one. What is one small version of that activity you could do today, even if just for 5 minutes?
           </p>
         </div>
       </div>
@@ -755,7 +759,7 @@ export default function ValuesWorksheet() {
                 
                 <div style={{ ...styles.infoBox, ...styles.infoBoxGreen }}>
                   <p style={{ ...styles.p, textAlign:'center' }}>
-                    You may find it helpful to return to this app to track how often you do certain activities over time.<br />Give it a try!<br />Select <u><b>Track Your Progress</b></u> to get started.
+                    You may find it helpful to return to this app to track how often you do certain activities over time.<br /><br />Give it a try!<br />Select <u><b>Track Your Progress</b></u> to get started.
                   </p>
                 </div>
 
@@ -787,19 +791,19 @@ export default function ValuesWorksheet() {
               </div>,
 
               <div key="progress">
-                <h2 style={styles.h2}>Your Progress Over Time</h2>
+                <h2 style={styles.h2}>Your Activity Log</h2>
                 
                 {weeklyData.length === 1 && (
                   <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess }}>
                     <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}><u>Great work</u> making it this far! Keep it up!</p>
                     <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
-                      Your data is saved to this browser. Return to this page anytime to do check-ins and track your progress.
+                      Your data is saved to this device's browser. Return to this page on this device anytime to do check-ins and track your progress.
                     </p>
                     <p style={{ ...styles.p, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                      <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and click "Check-In" to record which activities you did. Checking in once a week is a great way to start.
+                      <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and select "Check-In" to record which activities you did. Checking in once a week is a great way to start. Can you work up to checking in every day?
                     </p>
                     <p style={{ ...styles.p, fontSize: '0.875rem' }}>
-                      If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Start Over" from the home screen. Note that this will clear your data.
+                      If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Restart" from the home screen. Note that this will clear your data.
                     </p>
                   </div>
                 )}
@@ -807,7 +811,7 @@ export default function ValuesWorksheet() {
                 {weeklyData.length > 0 && (
                   <>
                     <div style={{ background: 'white', border: '2px solid #e5e7eb', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
-                      <h3 style={{ ...styles.h3, color: '#374151' }}>Activity Trends</h3>
+                      <h3 style={{ ...styles.h3, color: '#374151' }}>Trends</h3>
                       <ResponsiveContainer width="100%" height={300}>
                         <LineChart 
                           data={weeklyData.map(entry => ({
@@ -995,7 +999,6 @@ export default function ValuesWorksheet() {
                                 <p style={{ marginTop: '0.25rem', fontWeight: 'bold', color: '#1f2937' }}>Values Reward: {entry.valuesRating}</p>
                               )}
                             </div>
-                          )
                         </div>
                       ))}
                     </div>
@@ -1005,6 +1008,12 @@ export default function ValuesWorksheet() {
                       <p style={styles.p}>Total check-ins: {weeklyData.length}</p>
                       <p style={styles.p}>Average comfort activities per check-in: {(weeklyData.reduce((sum, e) => sum + e.comfortCount, 0) / weeklyData.length).toFixed(1)}</p>
                       <p style={styles.p}>Average values-based activities per check-in: {(weeklyData.reduce((sum, e) => sum + e.valuesCount, 0) / weeklyData.length).toFixed(1)}</p>
+                      {weeklyData.some(e => e.comfortRating !== null && e.comfortRating !== undefined) && (
+                        <p style={styles.p}>Average comfort reward rating: {(weeklyData.filter(e => e.comfortRating !== null && e.comfortRating !== undefined).reduce((sum, e) => sum + e.comfortRating, 0) / weeklyData.filter(e => e.comfortRating !== null && e.comfortRating !== undefined).length).toFixed(1)}</p>
+                      )}
+                      {weeklyData.some(e => e.valuesRating !== null && e.valuesRating !== undefined) && (
+                        <p style={styles.p}>Average values reward rating: {(weeklyData.filter(e => e.valuesRating !== null && e.valuesRating !== undefined).reduce((sum, e) => sum + e.valuesRating, 0) / weeklyData.filter(e => e.valuesRating !== null && e.valuesRating !== undefined).length).toFixed(1)}</p>
+                      )}
                     </div>
                   </>
                 )}
@@ -1045,15 +1054,15 @@ export default function ValuesWorksheet() {
                   {weeklyData.length === 2 && (
                     <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess, marginTop: '1.5rem' }}>
                       <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}><u>Great work</u> making it this far! Keep it up!</p>
-                      <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
-                        Your data is saved to this browser. Return to this page anytime to do check-ins and track your progress.
-                      </p>
-                      <p style={{ ...styles.p, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                        <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and click "Check-In" to record which activities you did. Checking in once a week is a great way to start.
-                      </p>
-                      <p style={{ ...styles.p, fontSize: '0.875rem' }}>
-                        If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Start Over" from the home screen. Note that this will clear your data.
-                      </p>
+                    <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
+                      Your data is saved to this device's browser. Return to this page on this device anytime to do check-ins and track your progress.
+                    </p>
+                    <p style={{ ...styles.p, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                      <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and select "Check-In" to record which activities you did. Checking in once a week is a great way to start. Can you work up to checking in every day?
+                    </p>
+                    <p style={{ ...styles.p, fontSize: '0.875rem' }}>
+                      If you find it helpful, you can update your activity lists by starting over from the beginning. To do this, select "Restart" from the home screen. Note that this will clear your data.
+                    </p>
                     </div>
                   )}
               </div>
@@ -1064,7 +1073,7 @@ export default function ValuesWorksheet() {
                 <div style={styles.card}>
                   {showCheckIn ? (
             <div>
-              <h2 style={{ ...styles.h2, marginBottom: '2rem' }}>Check-In</h2>
+              <h2 style={{ ...styles.h2, color: '#1f2937', marginBottom: '2rem' }}>Check-In</h2>
               
               <div style={{ marginBottom: '2rem' }}>
                 <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 'bold', fontSize: '1.125rem', color: '#1f2937' }}>
@@ -1101,7 +1110,7 @@ export default function ValuesWorksheet() {
 
               <div style={{ marginBottom: '2rem' }}>
                 <p style={{ ...styles.p, fontWeight: 'bold', fontSize: '1.125rem', marginBottom: '1rem' }}>
-                  Check any activities you did in the past 7 days
+                  Check any activities you did recently.
                 </p>
                 <div style={styles.grid}>
                   <div style={{ ...styles.activityBox, ...styles.comfortBox }}>
@@ -1265,7 +1274,7 @@ export default function ValuesWorksheet() {
                       {showStartOverConfirm && (
                         <div style={styles.modal}>
                           <div style={styles.modalContent}>
-                            <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Start Over?</h3>
+                            <h3 style={{ ...styles.h3, color: '#1f2937', fontSize: '1.25rem' }}>Start over from the beginning?</h3>
                             <p style={styles.p}>
                               This will allow you to set new activity lists, but will permanently delete all your saved activities and tracking data. Are you sure you want to start over?
                             </p>
@@ -1274,7 +1283,7 @@ export default function ValuesWorksheet() {
                                 onClick={confirmStartOver}
                                 style={{ ...styles.button, ...styles.btnDanger, flex: 1, marginBottom: 0 }}
                               >
-                                Yes, Start Over
+                                Yes, Restart
                               </button>
                               <button
                                 onClick={cancelStartOver}
@@ -1289,9 +1298,9 @@ export default function ValuesWorksheet() {
                       {showQRCode && (
                         <div style={styles.modal}>
                           <div style={styles.modalContent}>
-                            <h3 style={{ ...styles.h3, fontSize: '1.25rem' }}>Link</h3>
+                            <h3 style={{ ...styles.h3, color: '#1f2937', fontSize: '1.25rem' }}>Link</h3>
                             <p style={styles.p}>
-                              Use the QR code or the link below to access the values alignment exercise.
+                              Use the QR code or the link below to access the values alignment exercise home page.
                             </p>
                             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
                               <QRCode 
