@@ -406,7 +406,9 @@ export default function ValuesWorksheet() {
     <div key="intro" style={{ marginBottom: '1.5rem' }}>
       <h1 style={styles.h1}>Values Alignment Exercise</h1>
       <p style={styles.introText}>
-        This exercise helps you see how your daily choices align with your values, and find small ways to move toward what is important to you. Use this exercise if you are struggling with low mood or feeling stuck.<br />It takes about 5 minutes.<br /><br />This app is only for honest personal use. None of your information is collected or shared. 
+        This exercise helps you see how your daily choices align with your values, and find small ways to move toward what is important to you. Use this exercise if you are struggling with low mood or feeling stuck.
+        <br />It takes 5 – 10 minutes.
+        <br /><br />This app is only for honest personal use. None of your information is collected or shared. 
       </p>
       {isTracking && weeklyData.length > 0 ? (
         <div>
@@ -455,9 +457,9 @@ export default function ValuesWorksheet() {
     
     // Part 1
     <div key="part1">
-      <h2 style={styles.h2}>Part 1: What are things you do regularly to help yourself feel better?</h2>
+      <h2 style={styles.h2}>What are things you do regularly to help yourself feel better?</h2>
       <p style={styles.p}>
-        We all have activities we use to help deal with stress and bad feelings. When life feels overwhelming, when we need immediate relief, or when we're dealing with something difficult, we turn to familiar comforts.
+        We all have activities we use to help deal with stress and bad feelings. When we need immediate relief or when we are dealing with something difficult, we turn to familiar comforts.
       </p>
       <p style={{ ...styles.p, fontWeight: '500' }}>
         List 5 activities you do regularly for immediate comfort, energy, entertainment, or to cope with something difficult:
@@ -519,7 +521,7 @@ export default function ValuesWorksheet() {
 
     // Part 2
     <div key="part2">
-      <h2 style={styles.h2}>Part 2: What values are most important to you?</h2>
+      <h2 style={styles.h2}>What values are most important to you?</h2>
       <p style={styles.p}>
         Values are the qualities and directions that give your life meaning. They represent who you want to be and how you want to relate to the world. Think about what matters most deeply to you. Below is a list of some common values.
       </p>
@@ -571,9 +573,9 @@ export default function ValuesWorksheet() {
 
     // Part 3
     <div key="part3">
-      <h2 style={styles.h2}>Part 3: What activities connect you to these values?</h2>
+      <h2 style={styles.h2}>What activities connect you to these values?</h2>
       <p style={styles.p}>
-        Think about the specific things you can do that connect to these values. These are activities that, when you do them, make you feel like you're living according to what matters most to you. They might require effort or be challenging, but they align with who you want to be.
+        Think about the specific things you can do that connect to these values. These are activities that, when you do them, make you feel like you are living according to what matters most to you. They might require effort or be challenging, but they align with who you want to be.
       </p>
       
       {selectedValues.some(v => v) && (
@@ -616,9 +618,9 @@ export default function ValuesWorksheet() {
 
     // Part 4 - Comparison
     <div key="part4">
-      <h2 style={styles.h2}>Part 4: Which activities have you done recently?</h2>
+      <h2 style={styles.h2}>Which activities have you done recently?</h2>
       <p style={styles.p}>
-        Now, look at all the activities you listed in Parts 1 and 3. Check any activities you did in the past 7 days.
+        Now, look at all the activities you listed so far. Check any activities you did in the past 7 days.
       </p>
       
       <div style={styles.grid}>
@@ -740,7 +742,7 @@ export default function ValuesWorksheet() {
         <div style={styles.infoBoxWhite}>
           <p style={{ ...styles.p, fontWeight: '500', marginBottom: '0.5rem', paddingLeft: '1.5rem' }}>Action Step:</p>
           <p style={{ ...styles.p, paddingLeft: '1.5rem' }}>
-            Look at your values-based activities that did not get a check mark. Pick one. What is one small version of that activity you could do today, even if just for 5 minutes?
+            Look at your values-based activities that did not get a check mark. Pick one. What is one small version of that activity you could do today, even if just for 5 – 10 minutes?
           </p>
         </div>
       </div>
@@ -797,7 +799,7 @@ export default function ValuesWorksheet() {
                   <div style={{ ...styles.infoBox, ...styles.infoBoxSuccess }}>
                     <p style={{ ...styles.p, fontWeight: 'bold', color: '#065f46', marginBottom: '0.5rem' }}><u>Great work</u> making it this far! Keep it up!</p>
                     <p style={{ ...styles.p, marginBottom: '0.75rem' }}>
-                      Your data is saved to this device's browser. Return to this page on this device anytime to do check-ins and track your progress.
+                      Your data is saved to this browser on this device. Return to this page anytime to do check-ins and track your progress.
                     </p>
                     <p style={{ ...styles.p, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
                       <strong>How to use:</strong> Bookmark this page or save the QR code. Come back regularly and select "Check-In" to record which activities you did. Checking in once a week is a great way to start. Can you work up to checking in every day?
@@ -1110,7 +1112,7 @@ export default function ValuesWorksheet() {
 
               <div style={{ marginBottom: '2rem' }}>
                 <p style={{ ...styles.p, fontWeight: 'bold', fontSize: '1.125rem', marginBottom: '1rem' }}>
-                  Check any activities you did recently.
+                  Which activities did you do recently?
                 </p>
                 <div style={styles.grid}>
                   <div style={{ ...styles.activityBox, ...styles.comfortBox }}>
@@ -1168,7 +1170,7 @@ export default function ValuesWorksheet() {
               </div>
 
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ ...styles.h3, fontSize: '1.125rem', marginBottom: '1.5rem', color: '#374151' }}>Rate Your Activities</h3>
+            <h3 style={{ ...styles.h3, fontSize: '1.125rem', marginBottom: '1.5rem', color: '#374151' }}>Rate your activities:</h3>
             
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: '#374151' }}>
@@ -1194,7 +1196,7 @@ export default function ValuesWorksheet() {
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '0', paddingRight: '3rem' }}>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>1</div>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>None</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Not at all</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>5</div>
